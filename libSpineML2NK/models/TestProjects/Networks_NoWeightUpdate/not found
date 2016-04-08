@@ -1,0 +1,113 @@
+<modelMetaData>
+ <population name="O_O_pop_1">
+  <xPos value="0.18"/>
+  <yPos value="2.8026e-45"/>
+  <animSpeed value="0.2"/>
+  <aspectRatio value="1.66667"/>
+  <colour blue="0" green="0" red="0"/>
+  <size value="1"/>
+  <tag value="1"/>
+  <x3D value="0"/>
+  <y3D value="0"/>
+  <z3D value="0"/>
+  <is_visualised value="1"/>
+ </population>
+ <population name="O_O_pop_2">
+  <xPos value="6.42"/>
+  <yPos value="0.02"/>
+  <animSpeed value="0.2"/>
+  <aspectRatio value="1.66667"/>
+  <colour blue="0" green="0" red="0"/>
+  <size value="1"/>
+  <tag value="2"/>
+  <x3D value="0"/>
+  <y3D value="0"/>
+  <z3D value="0"/>
+  <is_visualised value="0"/>
+ </population>
+ <genericInput destination="O_O_pop_2" srcPort="spike" source="O_O_pop_1" dstPort="I_spike">
+  <start x="1.01325523853302" y="-1.173049548267493e-29"/>
+  <curves>
+   <curve>
+    <C1 xpos="2.849920272827148" ypos="-1.173049548267493e-29"/>
+    <C2 xpos="3.748114585876465" ypos="0.02000766806304455"/>
+    <end xpos="5.584780216217041" ypos="0.02000766806304455"/>
+   </curve>
+  </curves>
+  <connection/>
+ </genericInput>
+ <population name="A_A_pop_1">
+  <xPos value="0.180001"/>
+  <yPos value="-2.02"/>
+  <animSpeed value="0.2"/>
+  <aspectRatio value="1.66667"/>
+  <colour blue="0" green="0" red="0"/>
+  <size value="1"/>
+  <tag value="4"/>
+  <x3D value="0"/>
+  <y3D value="0"/>
+  <z3D value="0"/>
+  <is_visualised value="0"/>
+ </population>
+ <population name="A_A_pop_2">
+  <xPos value="6.4"/>
+  <yPos value="-2"/>
+  <animSpeed value="0.2"/>
+  <aspectRatio value="1.66667"/>
+  <colour blue="0" green="0" red="0"/>
+  <size value="1"/>
+  <tag value="5"/>
+  <x3D value="0"/>
+  <y3D value="0"/>
+  <z3D value="0"/>
+  <is_visualised value="0"/>
+ </population>
+ <genericInput destination="A_A_pop_2" srcPort="spike" source="A_A_pop_1" dstPort="I_spike">
+  <start x="1.013382315635681" y="-2.011385917663574"/>
+  <curves>
+   <curve>
+    <C1 xpos="3.36004900932312" ypos="-1.989247560501099"/>
+    <C2 xpos="3.221603631973267" ypos="-2.029597997665405"/>
+    <end xpos="5.5682692527771" ypos="-2.00745964050293"/>
+   </curve>
+  </curves>
+  <connection/>
+ </genericInput>
+ <population name="Population">
+  <xPos value="0.36"/>
+  <yPos value="-3.88"/>
+  <animSpeed value="0.2"/>
+  <aspectRatio value="1.66667"/>
+  <colour blue="0" green="0" red="0"/>
+  <size value="1"/>
+  <tag value="1"/>
+  <x3D value="0"/>
+  <y3D value="0"/>
+  <z3D value="0"/>
+  <is_visualised value="0"/>
+ </population>
+ <projection destination="Population 2" showlabel="1" source="Population" style="4">
+  <start x="1.19334" y="-3.87468"/>
+  <curves>
+   <curve>
+    <C1 xpos="3.90667" ypos="-3.87468"/>
+    <C2 xpos="3.90667" ypos="-3.76155"/>
+    <end xpos="5.56667" ypos="-3.76155"/>
+   </curve>
+  </curves>
+  <synapseConnection name="Population to Population 2 Synapse 0 weight_update"/>
+ </projection>
+ <population name="Population 2">
+  <xPos value="6.4"/>
+  <yPos value="-3.74"/>
+  <animSpeed value="0.2"/>
+  <aspectRatio value="1.66667"/>
+  <colour blue="0" green="0" red="0"/>
+  <size value="1"/>
+  <tag value="3"/>
+  <x3D value="0"/>
+  <y3D value="0"/>
+  <z3D value="0"/>
+  <is_visualised value="0"/>
+ </population>
+</modelMetaData>

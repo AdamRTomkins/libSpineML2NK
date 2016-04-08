@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SpineML xsi:schemaLocation="http://www.shef.ac.uk/SpineMLComponentLayer SpineMLComponentLayer.xsd" xmlns="http://www.shef.ac.uk/SpineMLComponentLayer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <ComponentClass type="postsynapse" name="ExpSynapse">
+  <Dynamics initial_regime="integrating">
+   <Regime name="integrating">
+    <TimeDerivative variable="eff">
+     <MathInline>-eff/tau</MathInline>
+    </TimeDerivative>
+    <OnImpulse target_regime="integrating" src_port="pre">
+     <StateAssignment variable="eff">
+      <MathInline>a</MathInline>
+     </StateAssignment>
+    </OnImpulse>
+   </Regime>
+   <StateVariable dimension="mA" name="eff"/>
+  </Dynamics>
+  <AnalogSendPort name="eff"/>
+  <ImpulseReceivePort dimension="?" name="pre"/>
+  <Parameter dimension="?" name="a"/>
+  <Parameter dimension="?" name="tau"/>
+  <Parameter dimension="?" name="gmax"/>
+ </ComponentClass>
+</SpineML>

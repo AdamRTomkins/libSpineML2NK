@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SpineML xsi:schemaLocation="http://www.shef.ac.uk/SpineMLComponentLayer SpineMLComponentLayer.xsd" xmlns="http://www.shef.ac.uk/SpineMLComponentLayer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <ComponentClass type="neuron_body" name="Integrator">
+  <Dynamics initial_regime="integrating">
+   <Regime name="integrating">
+    <TimeDerivative variable="V">
+     <MathInline>I</MathInline>
+    </TimeDerivative>
+    <OnCondition target_regime="integrating">
+     <StateAssignment variable="V">
+      <MathInline>0</MathInline>
+     </StateAssignment>
+     <Trigger>
+      <MathInline>V > 100</MathInline>
+     </Trigger>
+    </OnCondition>
+   </Regime>
+   <StateVariable dimension="?" name="V"/>
+  </Dynamics>
+  <AnalogReducePort dimension="?" name="I" reduce_op="+"/>
+  <AnalogSendPort name="V"/>
+ </ComponentClass>
+</SpineML>

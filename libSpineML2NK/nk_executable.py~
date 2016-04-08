@@ -1,0 +1,91 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+"""nk_exectuable will store a single executable experiment, designed in SpineML
+
+SpineML is a declaratice Spiking neuron modelling language.
+"""
+
+
+#import os  # STD lib imports first
+#import sys  # alphabetical
+
+#import some_third_party_lib  # 3rd party stuff next
+#import some_third_party_other_lib  # alphabetical
+import argparse
+
+import libSpineML
+from libSpineML import smlBundle
+#import local_stuff  # local stuff last
+#import more_local_stuff
+#import dont_import_two, modules_in_one_line  # IMPORTANT!
+#from pyflakes_cannot_handle import *  # and there are other reasons it should be avoided # noqa
+# Using # noqa in the line above avoids flake8 warnings about line length!
+
+
+#_a_global_var = 2  # so it won't get imported by 'from foo import *'
+#_b_global_var = 3
+
+#A_CONSTANT = 'ugh.'
+
+
+# 2 empty lines between top-level funcs + classes
+def naming_convention():
+    """Write docstrings for ALL public classes, funcs and methods.
+
+    Functions use snake_case.
+    """
+    if x == 4:  # x is blue <== USEFUL 1-liner comment (2 spaces before #)
+        x, y = y, x  # inverse x and y <== USELESS COMMENT (1 space after #)
+    c = (a + b) * (a - b)  # operator spacing should improve readability.
+    dict['key'] = dict[0] = {'x': 2, 'cat': 'not a dog'}
+
+
+class Executable(object):
+    """Executable Neurokernel Object
+
+    Can take a libSpineML bundle, or a SpineML Experiment file
+    """
+
+    # some examples of how to wrap code to conform to 79-columns limit:
+    def __init__(self, experiment=None):
+        if type(experiment) is str:
+            self.bundle = smlBundle.Bundle(experiment)
+
+        elif type(experiment) is smlBundle.Bundle:
+            self.bundle = experiment
+
+        else:
+            self.bundle = smlBundle.Bundle()
+
+
+    # 1 empty line between in-class def'ns
+    def foo_method(self, x, y=None):
+        """Method and function names are lower_case_with_underscores.
+
+        Always use self as first arg.
+        """
+        pass
+
+    @classmethod
+    def bar(cls):
+        """Use cls!"""
+        pass
+
+
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-e', '--experiment', default='none', type=str,
+                        help='Path to a SpineML experiment file')
+    args = parser.parse_args()
+
+    if args.experiment is not 'none':
+        exe = Executable(args.experiment)
+        print exe.bundle
+    else:
+        print "No Experiment Provided"
+
+if __name__=='__main__':
+    main()
+

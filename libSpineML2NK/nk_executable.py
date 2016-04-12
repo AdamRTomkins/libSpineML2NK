@@ -12,10 +12,15 @@ SpineML is a declaratice Spiking neuron modelling language.
 #import some_third_party_lib  # 3rd party stuff next
 #import some_third_party_other_lib  # alphabetical
 import argparse
+import numpy as np
 import pdb
+import networkx as nx
+
 
 import libSpineML
 from libSpineML import smlBundle
+import nk_utils
+import nk_inputs
 #import local_stuff  # local stuff last
 #import more_local_stuff
 #import dont_import_two, modules_in_one_line  # IMPORTANT!
@@ -27,27 +32,6 @@ from libSpineML import smlBundle
 #_b_global_var = 3
 
 #A_CONSTANT = 'ugh.'
-
-
-# 2 empty lines between top-level funcs + classes
-def units(value,unit):
-    """Write docstrings for ALL public classes, funcs and methods.
-
-    Functions use snake_case.
-    """
-    units = {
-         'GV': 1*(10**9),'MV': 1*(10**6),'kV': 1*(10**3),'V' : 1,'cV': 1*(10**-1),'mV': 1*(10**-3),'uV': 1*(10**-6),'nV': 1*(10**-9),'pV': 1*(10**-12),'fV': 1*(10**-15),
-         'GOhm': 1*(10**9),'MOhm': 1*(10**6),'kOhm': 1*(10**3),'Ohm' : 1,'cOhm': 1*(10**-1),'mOhm': 1*(10**-3),'uOhm': 1*(10**-6),'nOhm': 1*(10**-9),'pOhm': 1*(10**-12),'fOhm': 1*(10**-15),
-         'GA': 1*(10**9),'MA': 1*(10**6),'kA': 1*(10**3),'A' : 1,'cA': 1*(10**-1),'mA': 1*(10**-3),'uA': 1*(10**-6),'nA': 1*(10**-9),'pA': 1*(10**-12),'fA': 1*(10**-15),
-         'GF': 1*(10**9),'MF': 1*(10**6),'kF': 1*(10**3),'F' : 1,'cF': 1*(10**-1),'mF': 1*(10**-3),'uF': 1*(10**-6),'nF': 1*(10**-9),'pF': 1*(10**-12),'fF': 1*(10**-15),
-         'GS': 1*(10**9),'MS': 1*(10**6),'kS': 1*(10**3),'S' : 1,'cS': 1*(10**-1),'mS': 1*(10**-3),'uS': 1*(10**-6),'nS': 1*(10**-9),'pS': 1*(10**-12),'fS': 1*(10**-15),'?':1
-        }
-
-    if unit in units:
-        return(value * units[unit])
-    else:
-        raise ValueError("Unit not in units list: %s" % unit)
-
 
 
 
@@ -69,6 +53,7 @@ class Executable(object):
         else:
             self.bundle = smlBundle.Bundle()
         self.params = {}
+        self.network = nx.DiGraph()   
 
 
 
@@ -112,10 +97,8 @@ class Executable(object):
         self.params['name'] = exp.get_name()
 
         # save everything in standard units before saving
-        pdb.set_trace()
-
-        self.params['dt'] = units(float(exp.Simulation.AbstractIntegrationMethod.dt),'mS')
-        self.params['steps'] = units(float(exp.Simulation.duration),'S') / self.params['dt']
+        self.params['dt'] = nk_utils.units(float(exp.Simulation.AbstractIntegrationMethod.dt),'mS')
+        self.params['steps'] = nk_utils.units(float(exp.Simulation.duration),'S') / self.params['dt']
 
     def process_network(self):
         """Process to the experiment file to extract NK relevant objects
@@ -130,12 +113,75 @@ class Executable(object):
         for n in self.bundle.networks[0].Population:
             num_neurons += n.Neuron.size
             print num_neurons
+        
+        exp_name = self.bundle.keys()[0]
+        populations = self.bundle.index['exp_name']['network']['model.xml'].Population
+
+
+        lpu_index = 0
+
+        for p in populations:
+            lpu_start = lpu_index;          # Start position for each neuron
+
+            for n in np.arange(0,p.Neuron.size):
+                self.add_neuron(p.Neuron.url,p.Neuron.Property,lpu_index,n,p.Neuron.name)
+                lpu_index +=1
+
+            for i in self.index[exp_name]['experiment'][exp_name].Experiment[0].AbstractInput:
+                if p.Neuron.name ==  i.target:
+                    self.initialise_input(i,lpu_start,pop.size)
+            
+    def initialise_input(self,params,lpu_start,lpu_size):
+        """ initialise an input in the matrix for a given input to a population  
+
+        itype=  params['type']
+
+        if (itype == 'TimeVaryingArrayInput'):
+            self.TimeVaryingArrayInput(params,lpu_start,lpu_size)
+
+        if (itype == 'ConstantInput'):
+            self.ConstantInput(params,lpu_start,lpu_size)
+
+        if (itype == 'ConstantArrayInput'):
+            self.ConstantArrayInput(params,lpu_start,lpu_size)
+
+        if (itype == 'TimeVaryingInput'):
+            self.TimeVaryingInput(params,lpu_start,lpu_size)
+        """
+        pass
+
         # create Input file 
         # for every population in Network
             
-        
-        
+    def standard_neurons(self,model):
+        """ provide the base neuron parameters from neurokernel, which are not in SpineML """
+        """ DEPRECIATED TO ALLOW C_GENERATION 
+            URL is used to load the correct kernel 
+            WIP: Automatic discovery of extern, spiking and public based on component and connections
+            external is true, to work with input generation, this will not scale well
+      
+        """
+        return {'model': 'SpineMLNeuron','name': 'neuron_x','extern': True,'public': False,'spiking': True,'selector': '/a[0]','V':0,"url":model}
 
+
+    def add_neuron(self,model,props,lpu_index,p_index,pop_name):
+        """ add a neuron to the gexf population,
+            where p_index is the neuron index within a population
+        """
+        
+        neuron = self.standard_neurons(model)
+                
+        for p in props:
+            """  p example: 'C': {'dimension': 'nS','input':{'type':'FixedValue','value':1}} """
+            neuron[p.name] = nk_utils.gen_value(p,p_index)
+            
+            
+
+        neuron['name'] =     'neuron_' +str(lpu_index)  # + '_' + str(p_index)
+        neuron['selector'] = '/'+pop_name+'[' +str(lpu_index) +']'    #+ '[' + str(p_index)+']'
+       
+        self.network.add_node(lpu_index,attr_dict=neuron)
+      
 
 
     def process_component(self):

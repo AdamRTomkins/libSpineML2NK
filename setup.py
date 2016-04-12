@@ -14,6 +14,6 @@ setup(name='libSpineML2NK',
 
       install_requires=[
         'neurokernel >= 0.1',
-        'libSpineML  >= 0.1'
+        'libSpineML  >= 0.2'
       ]
      )

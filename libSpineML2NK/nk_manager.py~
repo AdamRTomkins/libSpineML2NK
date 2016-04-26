@@ -5,9 +5,7 @@
 SpineML is a declaratice Spiking neuron modelling language.
 """
 
-from neurokernel.core_gpu import Manager
-from neurokernel.tools.logging import setup_logger
-from libSpineML2NK.LPU import LPU
+
 
 
 def launch_nk(params):

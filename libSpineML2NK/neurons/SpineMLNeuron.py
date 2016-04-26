@@ -25,7 +25,7 @@ import pycuda.driver as cuda
 from pycuda.compiler import SourceModule
 
 from neurokernel.LPU.utils.simpleio import *
-
+from libSpineML import smlComponent
 #
 # Only Applicable for spiking neurons
 #
@@ -38,17 +38,17 @@ class SpineMLNeuron(BaseNeuron):
         self.steps = 1
         self.debug = debug
         self.LPU_id = LPU_id
-        self.component = component
+        self.component = component.ComponentClass
 
         # For every state varible
-        for parameter in self.component.state_variables:
-            exec("self.%s = garray.to_gpu( np.asarray( n_dict['%s'], dtype=np.float64 ))" % (parameter['name'],parameter['name']));
+        for parameter in self.component.Dynamics.StateVariable:
+            exec("self.%s = garray.to_gpu( np.asarray( n_dict['%s'], dtype=np.float64 ))" % (parameter.name,parameter.name));
            
         self.output = output
 
         #for every parameter in component
-        for parameter in self.component.parameters:
-            exec("self.%s = garray.to_gpu( np.asarray( n_dict['%s'], dtype=np.float64 ))" % (parameter['name'],parameter['name']));
+        for parameter in self.component.Parameter:
+            exec("self.%s = garray.to_gpu( np.asarray( n_dict['%s'], dtype=np.float64 ))" % (parameter.name,parameter.name));
 
         _num_dendrite_cond = np.asarray([n_dict['num_dendrites_cond'][i]
                                          for i in range(self.num_neurons)],
@@ -92,9 +92,9 @@ class SpineMLNeuron(BaseNeuron):
                                      tables.Float64Atom(), (0,self.num_neurons))
 
             # Set up state variables for debugging
-            for variable in self.component.state_variables:
-                exec("self.%s_file = tables.openFile(self.LPU_id + '_%s.h5', mode='w')" % (variable['name'],variable['name']));
-                exec("self.%s_file.createEArray('/','array', tables.Float64Atom(), (0,self.num_neurons))" % (variable['name']));
+            for variable in self.component.Dynamics.StateVariable:
+                exec("self.%s_file = tables.openFile(self.LPU_id + '_%s.h5', mode='w')" % (variable.name,variable.name));
+                exec("self.%s_file.createEArray('/','array', tables.Float64Atom(), (0,self.num_neurons))" % (variable.name));
 
 
     def create_kernel(self):
@@ -102,35 +102,42 @@ class SpineMLNeuron(BaseNeuron):
         var_str = ""    #,r,c,er,vt,vr
         var_ass_str = "" #r = R[nid];c = C[nid];er = Er[nid];vt = Vt[nid];vr = Vr[nid];
 
-        for parameter in self.component.parameters:
-            par_str = par_str+ ', %(type)s *%(par)s_s' % {"type": dtype_to_ctype(np.float64),"par": parameter['name']}
-            var_str = var_str+ '%(var)s,' % {"var": parameter['name']}
-            var_ass_str = var_ass_str+ '%(var)s = %(par)s_s[nid];' % {"var": parameter['name'],"par": parameter['name']}
+        for parameter in self.component.Parameter:
+            par_str = par_str+ ', %(type)s *%(par)s_s' % {"type": dtype_to_ctype(np.float64),"par": parameter.name}
+            var_str = var_str+ '%(var)s,' % {"var": parameter.name}
+            var_ass_str = var_ass_str+ '%(var)s = %(par)s_s[nid];' % {"var": parameter.name,"par": parameter.name}
         
         ## Send Port Code
         sp_dec = ""
         sp_save = ""
         sp_output_type = ""
         sp_zero_str = ""
-        for sp in self.component.send_ports:
-            if sp['type'] =="Event":
-                sp_dec = sp_dec + "int %(sp)s;" %  {"sp": sp['name']}
-                sp_zero_str = sp_zero_str + "%(sp)s = 0;" % {"sp": sp['name']} 
-                sp_output_type = "int"   
-            else :#  Assume Analog
-                #sp_dec = sp_dec + "%(type)s %(sp)s;" % {"type": dtype_to_ctype(np.float64),"sp": sp['name']}
-                sp_output_type = "double"#"%(type)s" % {"type": dtype_to_ctype(np.float64)}, # Assume Double
-            sp_save = sp_save + sp['name'] 
+    
         ## Recieve Port Code
         rp_dec_str = ""
         rp_ass_str = ""
         rp_tmp_dec_str = ""
 
-        for rp in self.component.recieve_ports:
-            unitScale = get_units(rp['dimension'])
-            rp_dec_str = rp_dec_str + " %(type)s *%(rp)s_s" %  {"rp": rp['name'],"type": dtype_to_ctype(np.float64)}
-            rp_ass_str = rp_ass_str + " %(rp)s = %(rp2)s_s[nid] * %(UnitScale)f;" %  {"rp": rp['name'],"rp2": rp['name'],"UnitScale":unitScale}
-            rp_tmp_dec_str = rp_tmp_dec_str + "%(rp)s\n\t" % {"rp": rp['name']}  
+        for p in self.component.Port: ### HERE
+
+            
+
+            if type(p) is smlComponent.EventSendPortType:
+                sp_dec = sp_dec + "int %(sp)s;" %  {"sp": sp['name']}
+                sp_zero_str = sp_zero_str + "%(sp)s = 0;" % {"sp": sp['name']} 
+                sp_output_type = "int"   
+                sp_save = sp_save + sp['name'] 
+
+            elif type(p) is smlComponent.AnalogSendPortType:              
+                sp_output_type = "double"
+                sp_save = sp_save + sp['name'] 
+            
+
+            if type(p) is smlComponent.AnalogReducePortType:
+                unitScale = nk_utils.units(p.dimension)
+                rp_dec_str = rp_dec_str + " %(type)s *%(rp)s_s" %  {"rp": p.name,"type": dtype_to_ctype(np.float64)}
+                rp_ass_str = rp_ass_str + " %(rp)s = %(rp2)s_s[nid] * %(UnitScale)f;" %  {"rp": p.name,"rp2": p.name,"UnitScale":unitScale}
+                rp_tmp_dec_str = rp_tmp_dec_str + "%(rp)s\n\t" % {"rp": p.name}  
             
         ## State Variable Code
         sv_dec_str = ""
@@ -138,33 +145,33 @@ class SpineMLNeuron(BaseNeuron):
         sv_ass_str = ""
         sv_save_str = ""
 
-        for sv in self.component.state_variables:
-            sv_dec_str = sv_dec_str + ",%(type)s *%(sv)s_sv\n    " % {"type": dtype_to_ctype(np.float64),"sv": sv['name']} 
-            sv_tmp_dec_str = sv_tmp_dec_str + "%(sv)s,\n\t" % {"type": dtype_to_ctype(np.float64),"sv": sv['name']}   
-            sv_ass_str = sv_ass_str+ '%(sv_tmp)s = %(sv)s_sv[nid];' % {"sv_tmp": sv['name'],"sv": sv['name']}          
-            sv_save_str = sv_save_str+ '%(sv)s_sv[nid] = %(sv_tmp)s;' % {"sv_tmp": sv['name'],"sv": sv['name']}    
+        for sv in self.component.Dynamics.StateVariable:
+            sv_dec_str = sv_dec_str + ",%(type)s *%(sv)s_sv\n    " % {"type": dtype_to_ctype(np.float64),"sv": sv.name} 
+            sv_tmp_dec_str = sv_tmp_dec_str + "%(sv)s,\n\t" % {"type": dtype_to_ctype(np.float64),"sv": sv.name}   
+            sv_ass_str = sv_ass_str+ '%(sv_tmp)s = %(sv)s_sv[nid];' % {"sv_tmp": sv.name,"sv": sv.name}          
+            sv_save_str = sv_save_str+ '%(sv)s_sv[nid] = %(sv_tmp)s;' % {"sv_tmp": sv.name,"sv": sv.name}    
 
         ### TODO: Expand to correctly allow several regimes
        
         ## Regime Code
-        for reg in self.component.regimes:
+        for reg in self.component.Dynamics.Regime:
             reg_str = ""
-            for td in reg["regime"].math:
+            for td in reg.TimeDerivative:
                 """ create component time derivitives """
-                reg_str = reg_str + '%(par)s = %(par2)s+ (dt * (%(math)s));'  % {"par":td["parameter"],"par2":td["parameter"],"math":td["math"]}
+                reg_str = reg_str + '%(par)s = %(par2)s+ (dt * (%(math)s));'  % {"par":td.variable,"par2":td.variable,"math":td.MathInline}
 
             
             con_str = ""
-            for con in reg["regime"].conditions:
+            for con in reg.OnCondition:
                 """ create component conditions """
                 ass_str = ""
 
-                for ass in con.assignments:
-                    ass_str = ass_str + "%(par)s = %(math)s;" % {"par":ass["parameter"],"math":ass["math"]}
+                for ass in con.StateAssignment:
+                    ass_str = ass_str + "%(par)s = %(math)s;" % {"par":ass.variable,"math":ass.MathInline}
                 
                 for eve in con.events:
-                    ass_str = ass_str +  eve + "= 1;"                
-                con_str= "if( %(trigger)s ){ %(assigns)s}" % {"trigger":con.trigger,"assigns":ass_str}
+                    ass_str = ass_str +  eve.port + "= 1;"                
+                con_str= "if( %(trigger)s ){ %(assigns)s}" % {"trigger":con.Trigger.MathInline,"assigns":ass_str}
         
         
 
@@ -239,11 +246,11 @@ __global__ void spine_ml_neuron(
     def eval(self, st=None):
         p_str = ""
         sv_str = ""
-        for parameter in self.component.parameters:
-            p_str = p_str+ ',self.%s.gpudata' % parameter['name']
+        for parameter in self.component.Parameter:
+            p_str = p_str+ ',self.%s.gpudata' % parameter.name
 
-        for variable in self.component.state_variables:
-            sv_str = sv_str+ ',self.%s.gpudata' % variable['name']
+        for variable in self.component.Dynamics.StateVariable:
+            sv_str = sv_str+ ',self.%s.gpudata' % variable.name
 
         ## TODO: Expand this to allow for multiple input ports
         exec("self.update.prepared_async_call(self.gpu_grid,self.gpu_block,st,self.num_neurons,self.dt,self.output %(state_vars)s, self.I.gpudata %(params)s)" % {"params":p_str,"state_vars":sv_str});
@@ -254,8 +261,8 @@ __global__ void spine_ml_neuron(
             self.I_file.root.array.append(self.I.get().reshape((1, -1)))
 
             # State Variable debugging recording 
-            for variable in self.component.state_variables:
-                exec("self.%s_file.root.array.append(self.%s.get().reshape((1, -1)))" % (variable['name'],variable['name']));
+            for variable in self.component.Dynamics.StateVariable:
+                exec("self.%s_file.root.array.append(self.%s.get().reshape((1, -1)))" % (variable.name,variable.name));
             
 
     def get_gpu_kernel( self):
@@ -270,10 +277,10 @@ __global__ void spine_ml_neuron(
         func = mod.get_function("spine_ml_neuron")
         p_str = ""
         sv_str = ""
-        for parameter in self.component.parameters:
+        for parameter in self.component.Parameter:
             p_str = p_str + ',np.intp'
 
-        for variable in self.component.state_variables:
+        for variable in self.component.Dynamics.StateVariable:
             sv_str = sv_str+ ',np.intp'
 
         ### TODO: UPDATE FOR Various Inputs
@@ -285,8 +292,8 @@ __global__ void spine_ml_neuron(
         ### Specify Outputs
         if self.debug:
             self.I_file.close()
-            for variable in self.component.state_variables:
-                exec("self.%s_file.close()" % (variable['name']));
+            for variable in self.component.Dynamics.StateVariable:
+                exec("self.%s_file.close()" % (variable.name));
            
 
     @property

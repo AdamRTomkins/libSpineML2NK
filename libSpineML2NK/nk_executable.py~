@@ -15,24 +15,20 @@ import argparse
 import numpy as np
 import pdb
 import networkx as nx
-
+import h5py
 
 import libSpineML
 from libSpineML import smlBundle
+from libSpineML import smlExperiment
+from neurokernel.core_gpu import Manager
+
 import nk_utils
+
 #import local_stuff  # local stuff last
 #import more_local_stuff
 #import dont_import_two, modules_in_one_line  # IMPORTANT!
 #from pyflakes_cannot_handle import *  # and there are other reasons it should be avoided # noqa
 # Using # noqa in the line above avoids flake8 warnings about line length!
-
-
-#_a_global_var = 2  # so it won't get imported by 'from foo import *'
-#_b_global_var = 3
-
-#A_CONSTANT = 'ugh.'
-
-
 
 class Executable(object):
     """Executable Neurokernel Object
@@ -40,7 +36,6 @@ class Executable(object):
     Can take a libSpineML bundle, or a SpineML Experiment file
     """
 
-    # some examples of how to wrap code to conform to 79-columns limit:
     def __init__(self, experiment=None):
         if type(experiment) is str:
             self.bundle = smlBundle.Bundle()
@@ -51,12 +46,13 @@ class Executable(object):
 
         else:
             self.bundle = smlBundle.Bundle()
-        self.params = {}
-        self.network = nx.DiGraph()   
+        self.params     = {}
+        self.network    = nx.DiGraph()
+        self.inputs     = np.zeros((0, 0), dtype=np.double)
+        self.time     = np.zeros((0, 0), dtype=np.double)
 
 
 
-    # 1 empty line between in-class def'ns
     def execute(self):
         """Execute the model, after processing the class
 
@@ -74,9 +70,23 @@ class Executable(object):
             components=params['components'])
             params['steps']
         """
-        process_experiment()
-        process_network()
-        process_component()
+        
+        self.params['input_file'] = 'input'
+        self.params['output_file'] = 'output.h5'
+
+        self.process_experiment()
+        self.process_network()
+        self.process_component()
+
+        ## output the input
+        with h5py.File(self.params['input_file']+'.h5', 'w') as f:
+            f.create_dataset('array', (self.params['steps'], self.params['num_neurons']),
+                         dtype=np.double,
+                         data=self.inputs)   
+
+        import nk_manager
+        nk_manager.launch_nk(self.params)
+
         # from nk_manager import launch_nk
         #launch_nk(self.params)
 
@@ -98,6 +108,16 @@ class Executable(object):
         # save everything in standard units before saving
         self.params['dt'] = nk_utils.units(float(exp.Simulation.AbstractIntegrationMethod.dt),'mS')
         self.params['steps'] = nk_utils.units(float(exp.Simulation.duration),'S') / self.params['dt']
+        self.params['num_neurons'] = 0;
+
+        for n in self.bundle.networks[0].Population:
+            self.params['num_neurons']+= n.Neuron.size
+
+        self.inputs = np.zeros((self.params['steps'], self.params['num_neurons']), dtype=np.double)
+        self.time   = time = np.arange(0,self.params['dt']*self.params['steps'] , self.params['dt'])
+
+        # Provess Lesions
+        # Process Configutations
 
     def process_network(self):
         """Process to the experiment file to extract NK relevant objects
@@ -107,15 +127,9 @@ class Executable(object):
         # create n_dict
         # create s_dict
 
-        # get number or neurons
-        num_neurons = 0;
-        for n in self.bundle.networks[0].Population:
-            num_neurons += n.Neuron.size
-            print num_neurons
-        
-        exp_name = self.bundle.keys()[0]
-        populations = self.bundle.index['exp_name']['network']['model.xml'].Population
-
+        exp_name = self.bundle.index.keys()[0]
+        model_name = self.bundle.index[exp_name]['network'].keys()[0]
+        populations = self.bundle.index[exp_name]['network'][model_name].Population
 
         lpu_index = 0
 
@@ -126,32 +140,33 @@ class Executable(object):
                 self.add_neuron(p.Neuron.url,p.Neuron.Property,lpu_index,n,p.Neuron.name)
                 lpu_index +=1
 
-            for i in self.index[exp_name]['experiment'][exp_name].Experiment[0].AbstractInput:
+            for i in self.bundle.index[exp_name]['experiment'][exp_name].Experiment[0].AbstractInput:
                 if p.Neuron.name ==  i.target:
-                    self.initialise_input(i,lpu_start,pop.size)
+                    self.initialise_input(i,lpu_start,p.Neuron.size)
+
+        self.params['graph'] = self.network
+        
+
             
     def initialise_input(self,params,lpu_start,lpu_size):
-        """ initialise an input in the matrix for a given input to a population  
+        # initialise an input in the matrix for a given input to a population  
 
-        itype=  params['type']
+        itype =  type(params)
 
-        if (itype == 'TimeVaryingArrayInput'):
-            self.TimeVaryingArrayInput(params,lpu_start,lpu_size)
+        if (itype == smlExperiment.TimeVaryingArrayInputType):
+            self.inputs = nk_utils.TimeVaryingArrayInput(params,lpu_start,lpu_size,self.time,self.inputs)
 
-        if (itype == 'ConstantInput'):
-            self.ConstantInput(params,lpu_start,lpu_size)
+        elif (itype == smlExperiment.ConstantInputType):
+            self.inputs = nk_utils.ConstantInput(params,lpu_start,lpu_size,time,self.inputs)
 
-        if (itype == 'ConstantArrayInput'):
-            self.ConstantArrayInput(params,lpu_start,lpu_size)
+        elif (itype == smlExperiment.ConstantArrayInputType):
+            self.inputs = nk_utils.ConstantArrayInput(params,lpu_start,lpu_size,self.time,self.inputs)
 
-        if (itype == 'TimeVaryingInput'):
-            self.TimeVaryingInput(params,lpu_start,lpu_size)
-        """
-        pass
+        elif (itype == smlExperiment.TimeVaryingInputType):
+            self.inputs = nk_utils.TimeVaryingInput(params,lpu_start,lpu_size,self.time,self.inputs)
+        else:
+            raise TypeError('type %s is not recognised as an input type' %str(itype))            
 
-        # create Input file 
-        # for every population in Network
-            
     def standard_neurons(self,model):
         """ provide the base neuron parameters from neurokernel, which are not in SpineML """
         """ DEPRECIATED TO ALLOW C_GENERATION 
@@ -174,20 +189,21 @@ class Executable(object):
             """  p example: 'C': {'dimension': 'nS','input':{'type':'FixedValue','value':1}} """
             neuron[p.name] = nk_utils.gen_value(p,p_index)
             
-            
-
         neuron['name'] =     'neuron_' +str(lpu_index)  # + '_' + str(p_index)
         neuron['selector'] = '/'+pop_name+'[' +str(lpu_index) +']'    #+ '[' + str(p_index)+']'
        
-        self.network.add_node(lpu_index,attr_dict=neuron)
-      
-
+        self.network.add_node(str(lpu_index),attr_dict=neuron)
+     
 
     def process_component(self):
         """Process to the experiment file to extract NK relevant objects
         """
-        pass
-
+ 
+        exp_name = self.bundle.index.keys()[0]
+        self.params['components'] = self.bundle.index[exp_name]['component']      
+        
+        
+    
 
 
 
@@ -199,7 +215,7 @@ def main():
 
     if args.experiment is not 'none':
         exe = Executable(args.experiment)
-        print exe.bundle
+        exe.execute()
     else:
         print "No Experiment Provided"
 

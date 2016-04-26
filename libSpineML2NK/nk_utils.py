@@ -49,6 +49,28 @@ def units(value,unit):
     else:
         raise ValueError("Unit not in units list: %s" % unit)
 
+def poisson(dt,freq,samples):
+    """ return a poisson spike train """
+    return  np.random.uniform(size = samples)<dt*freq
+
+def regular(duration,steps,frequency):
+    """ return a regular spike train """
+    step_jump = (duration/frequency) / (duration/steps)
+    a= np.zeros(steps);
+    a[1::int(step_jump)]
+    return a
+
+def rate_based_distrobution(distribution, duration,steps,frequency):
+    """ filter between distrobutions """
+
+    if distribution == 'regular':
+        return regular(duration, steps,frequency)
+    elif distribution == 'poisson':
+        return poisson(duration, steps,frequency)
+    else:
+        log("Error","Rate Distrobution is not correctly defined")
+
+
 
 
 def TimeVaryingInput(params,lpu_start,lpu_size,time,inputs):
@@ -61,98 +83,106 @@ def TimeVaryingInput(params,lpu_start,lpu_size,time,inputs):
         params.duration = max(time)
 
 
+
     for tp_value in tp_values:
         
-        if params.rate_based_distribution is not None
-           
-            select = np.logical_and(time>params.start_time, time<params.end_time)
-            
-            for i in params.target_indicies:
+        """if params.rate_based_distribution is not None:
+           # REQUIRES TESTING
+            select = np.logical_and(time>=tp_value.time,time<=tp_value.time+params.duration)    
+            for i in params.target_indices:
                 inputs[select,lpu_start+i] = rate_based_distrobution(params.rate_based_distribution,params.duration,np.sum(select),int(tp_value.value))
         
         else:
-            if tp_value.value is not None:
-                for i in params.target_indicies:
-                    inputs[time>tp_value.time,lpu_start:lpu_start+lpu_size] =  tp_value.value
+        """
+        if tp_value.value is not None:
+            
+            for i in params.target_indices:
+                select = np.logical_and(time>=tp_value.time,time<=tp_value.time+params.duration)           
+                inputs[select,lpu_start:lpu_start+lpu_size] =  tp_value.value
 
-            else: # Single spike input
-                for i in params.target_indicies:
-                    inputs[time==tp_value.time,lpu_start+i] =  1
+        else: # Single spike input
+            for i in params.target_indices:
+                inputs[time==tp_value.time,lpu_start+i] =  1
     return inputs
 
 
-"""
-def ConstantArrayInput(self,params,lpu_start,lpu_size):
 
-    if not('start_time' in params):
-        params['start_time'] = 0
-    if not( 'duration' in params):
-        end_time = np.max(self.t)
-    else:
-        end_time = params['start_time'] + params['duration']
-        if end_time > np.max(self.t):
-            end_time = np.max(self.t)
+def ConstantArrayInput(params,lpu_start,lpu_size,time,inputs):
 
-    if 'rate_based_distribution' in params:
+    if params.start_time is None:
+        params.start_time = 0
+    if params.duration is None:
+        params.duration = max(time)
+
+    #if 'rate_based_distribution' in params:
+    # Requires Testing
+    """
         for i in np.arange(params['array_size']):
+            select = np.logical_and(time>=tp_value.time,time<=tp_value.time+params.duration)           
+            inputs[select,lpu_start+i] = rate_based_distrobution(params.rate_based_distribution,params.duration,np.sum(select),params.array_value[i])
+
+    else:
+    """
+    for i in np.arange(params.array_size):
+        select = np.logical_and(time>=params.start_time,time<=params.start_time+params.duration)     
+        inputs[select,lpu_start+i] =  params.array_value[i];
+
+    return inputs
+
+def ConstantInput(params,lpu_start,lpu_size,time,inputs):
+    if params.target_indices is None:
+        params.target_indices = np.arange(lpu_size)
+    if params.start_time is None:
+        params.start_time = 0
+    if params.duration is None:
+        params.duration = max(time)
+
+    #if 'rate_based_distribution' in params:
+    # Needs Testing
+    """
+        for i in params['target_indicies']:
             select = np.logical_and(self.t>params['start_time'], self.t<end_time)
-            self.I[select,lpu_start+i] = rate_based_distrobution(params['rate_based_distribution'],params['duration'],np.sum(select),params['array_value'][i])
+            self.I[select,lpu_start+i] = rate_based_distrobution(params['rate_based_distribution'],params['duration'],np.sum(select),params['value'])
 
-    else:
+        """
+    #    pass    
+    #else:
+    for i in params.target_indices:
+        select = np.logical_and(time>=params.start_time,time<=params.start_time+params.duration)  
+        inputs[select,lpu_start+i] =  params.value
+    return inputs
 
-        for i in np.arange(params['array_size']):
-            self.I[np.logical_and(self.t>params['start_time'],self.t<end_time),lpu_start+i] =  params['array_value'][i];
 
+def TimeVaryingArrayInput(params,lpu_start,lpu_size,time,inputs):
 
+    tpa_values = params.TimePointArrayValue
+             
+    if params.target_indices is None:
+        params.target_indices = np.arange(lpu_size)
+    if params.start_time is None:
+        params.start_time = 0
+    if params.duration is None:
+        params.duration = max(time)
 
-
-def ConstantInput(self,params,lpu_start,lpu_size):
-    if not( 'start_time' in params):
-        params['start_time'] = 0
-    if not( 'duration' in params):
-        end_time = np.max(self.t)
-    else:
-        end_time = params['start_time'] + params['duration']
-        if end_time > np.max(self.t):
-            end_time = np.max(self.t)
-
-    if 'rate_based_distribution' in params:
-        if ('target_indicies' in params):
-            for i in params['target_indicies']:
-                select = np.logical_and(self.t>params['start_time'], self.t<end_time)
-                self.I[select,lpu_start+i] = rate_based_distrobution(params['rate_based_distribution'],params['duration'],np.sum(select),params['value'])
-        else:
-            for i in np.arange(lpu_size):
-                select = np.logical_and(self.t>params['start_time'], self.t<end_time)
-                self.I[select,lpu_start+i] = rate_based_distrobution(params['rate_based_distribution'],params['duration'],np.sum(select),params['value'])
-    else:
-        if ('target_indicies' in params):
-            for i in params['target_indicies']:
-                self.I[np.logical_and(self.t>params['start_time'], self.t<end_time),lpu_start+i] =  params['value']
-        else:
-            for i in np.arange(lpu_size):
-                self.I[np.logical_and(self.t>params['start_time'], self.t<end_time),lpu_start+i] =  params['value']
-
-def TimeVaryingArrayInput(self,params,lpu_start,lpu_size):
-    tpa_values = params['TimePointArrayValue']                  #  TODO
     for tpa_value in tpa_values:
         #for every array time
+        """
         if 'rate_based_distribution' in params:
             for time, value in zip(tpa_value['array_time'],tpa_value['array_value']):
                 select = np.logical_and(self.t>params['start_time'], self.t<end_time)
                 self.I[select,lpu_start+int(tpa_value['index'])] = rate_based_distrobution(params['rate_based_distribution'],params['duration'],np.sum(select),value)
 
         else:
-            if 'array_value' in tpa_value:
-                for time, value in zip(tpa_value['array_time'],tpa_value['array_value']):
-                    self.I[self.t>time,lpu_start+int(tpa_value['index'])] = value
-                    print "Warning: Input does not contain input units"
+        """
 
-            else: # Single spike input
-                for time in tpa_value['array_time']:
-                    self.I[self.t==time,lpu_start+int(tpa_value['index'])] = 1
-                    print "Warning: Input does not contain input units"
+        if tpa_value.array_value is not None:
+            for array_time, value in zip(tpa_value.array_time,tpa_value.array_value):
+                inputs[time>=array_time,lpu_start+int(tpa_value.index)] = value
 
-"""
+        else: 
+            for array_time in tpa_value.array_time:
+                inputs[time==array_time,lpu_start+int(tpa_value.index)] = 1
+    return inputs
+
 
 

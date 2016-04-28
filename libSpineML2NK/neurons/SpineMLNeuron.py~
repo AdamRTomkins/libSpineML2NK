@@ -24,6 +24,8 @@ from pycuda.tools import dtype_to_ctype
 import pycuda.driver as cuda
 from pycuda.compiler import SourceModule
 
+from libSpineML2NK import nk_utils
+
 from neurokernel.LPU.utils.simpleio import *
 from libSpineML import smlComponent
 #
@@ -42,13 +44,13 @@ class SpineMLNeuron(BaseNeuron):
 
         # For every state varible
         for parameter in self.component.Dynamics.StateVariable:
-            exec("self.%s = garray.to_gpu( np.asarray( n_dict['%s'], dtype=np.float64 ))" % (parameter.name,parameter.name));
+            exec("self.%(name1)s = garray.to_gpu( np.asarray( n_dict['%(name2)s'], dtype=np.float64 ))" % {'name1':parameter.name,'name2':parameter.name});
            
         self.output = output
 
         #for every parameter in component
         for parameter in self.component.Parameter:
-            exec("self.%s = garray.to_gpu( np.asarray( n_dict['%s'], dtype=np.float64 ))" % (parameter.name,parameter.name));
+            exec("self.%(name1)s = garray.to_gpu( np.asarray( n_dict['%(name2)s'], dtype=np.float64 ))" % {'name1':parameter.name,'name2':parameter.name});
 
         _num_dendrite_cond = np.asarray([n_dict['num_dendrites_cond'][i]
                                          for i in range(self.num_neurons)],
@@ -123,18 +125,19 @@ class SpineMLNeuron(BaseNeuron):
             
 
             if type(p) is smlComponent.EventSendPortType:
-                sp_dec = sp_dec + "int %(sp)s;" %  {"sp": sp['name']}
-                sp_zero_str = sp_zero_str + "%(sp)s = 0;" % {"sp": sp['name']} 
+                sp_dec = sp_dec + "int %(sp)s;" %  {"sp": p.name}
+                sp_zero_str = sp_zero_str + "%(sp)s = 0;" % {"sp": p.name} 
                 sp_output_type = "int"   
-                sp_save = sp_save + sp['name'] 
+                sp_save = sp_save + p.name
 
             elif type(p) is smlComponent.AnalogSendPortType:              
                 sp_output_type = "double"
-                sp_save = sp_save + sp['name'] 
+                sp_save = sp_save + p.name 
             
 
             if type(p) is smlComponent.AnalogReducePortType:
-                unitScale = nk_utils.units(p.dimension)
+                # Note Traditional Use of Units
+                unitScale = nk_utils.units(1,p.dimension)
                 rp_dec_str = rp_dec_str + " %(type)s *%(rp)s_s" %  {"rp": p.name,"type": dtype_to_ctype(np.float64)}
                 rp_ass_str = rp_ass_str + " %(rp)s = %(rp2)s_s[nid] * %(UnitScale)f;" %  {"rp": p.name,"rp2": p.name,"UnitScale":unitScale}
                 rp_tmp_dec_str = rp_tmp_dec_str + "%(rp)s\n\t" % {"rp": p.name}  
@@ -169,7 +172,7 @@ class SpineMLNeuron(BaseNeuron):
                 for ass in con.StateAssignment:
                     ass_str = ass_str + "%(par)s = %(math)s;" % {"par":ass.variable,"math":ass.MathInline}
                 
-                for eve in con.events:
+                for eve in con.EventOut:
                     ass_str = ass_str +  eve.port + "= 1;"                
                 con_str= "if( %(trigger)s ){ %(assigns)s}" % {"trigger":con.Trigger.MathInline,"assigns":ass_str}
         

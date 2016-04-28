@@ -6,31 +6,37 @@ import pdb
 def gen_value(prop,index=0):
     """ convert a standard parameter set into a specific parameter """
 
-    try:
-        
-        if not prop.AbstractValue == None:
-            #Fixed Value
-            if type(prop.AbstractValue) == smlNetwork.FixedValueType:
-                value = prop.AbstractValue.value
-
-            elif type(prop.AbstractValue) == smlNetwork.ValueListType:
-                values =  prop.AbstractValue.Value
-                value = values[index]
-            
-        elif not prop.AbstractDistribution == None:    
-            np.random.seed(seed=prop.AbstractDistribution.seed + index) 
-            if type(prop.AbstractDistribution) == smlNetwork.UniformDistributionType:
-                value = np.random.uniform(prop.AbstractDistribution.minimum,prop.AbstractDistribution.maximum)
-
-            elif type(prop.AbstractDistribution) == smlNetwork.NormalDistributionType:
-               value = np.random.normal(prop.AbstractDistribution.mean,prop.AbstractDistribution.variance)
-
-            elif type(prop.AbstractDistribution) == smlNetwork.PoissonDistributionType:
-                value = np.random.poisson(prop.AbstractDistribution.mean)
+    #try:
     
-    except:
-        raise TypeError('Value type: %s not recognized' % str(type(prop)))
+    if not prop.AbstractValue == None:
+        #Fixed Value
+        if type(prop.AbstractValue) == smlNetwork.FixedValueType:
+            value = prop.AbstractValue.value
+
+        elif type(prop.AbstractValue) == smlNetwork.ValueListType:
+            values =  prop.AbstractValue.Value
+            value = values[index]
+        else:
+            raise TypeError('Property Abstract Value type: %s not recognized' % str(type(prop.AbstractValue)))                
         
+    elif not prop.AbstractDistribution == None:    
+        np.random.seed(seed=prop.AbstractDistribution.seed + index) 
+        if type(prop.AbstractDistribution) == smlNetwork.UniformDistributionType:
+            value = np.random.uniform(prop.AbstractDistribution.minimum,prop.AbstractDistribution.maximum)
+
+        elif type(prop.AbstractDistribution) == smlNetwork.NormalDistributionType:
+           value = np.random.normal(prop.AbstractDistribution.mean,prop.AbstractDistribution.variance)
+
+        elif type(prop.AbstractDistribution) == smlNetwork.PoissonDistributionType:
+            value = np.random.poisson(prop.AbstractDistribution.mean)
+        else:
+            raise TypeError('Property Abstract Distribution type: %s not recognized' % str(type(prop.AbstractDistribution)))
+    else:
+        raise TypeError('Property type: %s not recognized' % prop.name)
+        
+    #except:
+    #    raise TypeError('Value type: %s not recognized' % str(type(prop)))
+           
     return units(value,prop.dimension)
 
 def units(value,unit):
@@ -74,6 +80,10 @@ def rate_based_distrobution(distribution, duration,steps,frequency):
 
 
 def TimeVaryingInput(params,lpu_start,lpu_size,time,inputs):
+    """
+    time should be in seconds to keep standard units
+    WIP: trasnlate all times in this to seconds
+    """
     tp_values = params.TimePointValue                 
     if params.target_indices is None:
         params.target_indices = np.arange(lpu_size)
@@ -82,7 +92,7 @@ def TimeVaryingInput(params,lpu_start,lpu_size,time,inputs):
     if params.duration is None:
         params.duration = max(time)
 
-
+    pdb.set_trace()
 
     for tp_value in tp_values:
         

@@ -35,12 +35,12 @@ import utils.parray as parray
 from neurons import *
 #from neurons import baseneuron
 
-from translator_files.neurons import baseneuron
+from libSpineML2NK.neurons import baseneuron
 
 #from synapses import *
 
-from translator_files.synapses import basesynapse
-from translator_files.synapses import ExpSynapse
+from libSpineML2NK.synapses import basesynapse
+from libSpineML2NK.synapses import ExpSynapse
 
 
 PORT_IN_GPOT = 'port_in_gpot'
@@ -717,6 +717,12 @@ class LPU(Module):
         self.neurons = [ self._instantiate_neuron(i, t, n)
                          for i, (t, n) in enumerate(self.n_list)
                          if t!=PORT_IN_GPOT and t!=PORT_IN_SPK]
+        #self.log_info("self.neurons = %s" % str(self.n_list))
+        self.log_info("#############################1")
+        self.log_info("i =%s" % str(i))
+        self.log_info("t =%s" % str(t))
+        self.log_info("n =%s" % str(n))
+        self.log_info("#############################2")
 
         self.synapses = [ self._instantiate_synapse(i, t, n)
                          for i, (t, n) in enumerate(self.s_list)
@@ -994,6 +1000,7 @@ class LPU(Module):
     ## Or a list of models, if Component.name is the model name, instantiate it with that component
 
     def _instantiate_neuron(self, i, t, n):
+        self.log_info("Possible Names '%s'" % str(self._neuron_names))
         try:
             ind = self._neuron_names.index(t)
         except:
@@ -1002,18 +1009,30 @@ class LPU(Module):
             except:
                 self.log_info("Error instantiating neurons of model '%s'" % t)
                 return None
-        
+
         if n['spiking'][0]:
             ## ASSUMES ALL NEURONS CAN TAKE A COMPONENT CLASS
             ## Chose the relavent component to pass in, based on the url used to generate it
 
-            neuron = self._neuron_classes[ind](
-            n, int(int(self.spike_state.gpudata) +
-            self.spike_state.dtype.itemsize*self.idx_start_spike[i]),
-            self.dt, debug=self.debug, LPU_id=self.id,component=self.components[n['url'][0]])
+            # Check for a spineML neuron
+            self.log_info("i '%s'" % str(i))
+            self.log_info("t '%s'" % str(t))
+            self.log_info("comps '%s'" % str(self.components.keys()))
+
+            if t == 'SpineMLNeuron':
+                neuron = self._neuron_classes[ind](
+                n, int(int(self.spike_state.gpudata) +
+                self.spike_state.dtype.itemsize*self.idx_start_spike[i]),
+                self.dt, debug=self.debug, LPU_id=self.id,component=self.components[n['url'][0]])
+            else:
+                neuron = self._neuron_classes[ind](
+                n, int(int(self.spike_state.gpudata) +
+                self.spike_state.dtype.itemsize*self.idx_start_spike[i]),
+                self.dt, debug=self.debug, LPU_id=self.id)
+
 
         else:
-            ## REQUIRE: SpineML generation for graded potential neurons
+            ## REQUIRE: SpineML generation for graded potential neuronsgraph
             neuron = self._neuron_classes[ind](
                 n, int(self.V.gpudata) +
                 self.V.dtype.itemsize*self.idx_start_gpot[i],

@@ -14,6 +14,7 @@ SpineML is a declaratice Spiking neuron modelling language.
 import argparse
 import numpy as np
 import pdb
+
 import networkx as nx
 import h5py
 
@@ -22,7 +23,10 @@ from libSpineML import smlBundle
 from libSpineML import smlExperiment
 from neurokernel.core_gpu import Manager
 
+from libSpineML2NK.LPU import LPU
+
 import nk_utils
+import nk_manager
 
 #import local_stuff  # local stuff last
 #import more_local_stuff
@@ -71,24 +75,25 @@ class Executable(object):
             params['steps']
         """
         
-        self.params['input_file'] = 'input'
+        self.params['input_file'] = 'input.h5'
         self.params['output_file'] = 'output.h5'
 
         self.process_experiment()
         self.process_network()
         self.process_component()
 
+           
+
         ## output the input
-        with h5py.File(self.params['input_file']+'.h5', 'w') as f:
-            f.create_dataset('array', (self.params['steps'], self.params['num_neurons']),
-                         dtype=np.double,
-                         data=self.inputs)   
+        self.save_input()
+        self.save_network()
 
-        import nk_manager
-        nk_manager.launch_nk(self.params)
+        
 
-        # from nk_manager import launch_nk
-        #launch_nk(self.params)
+        #nk_manager.launch_nk(self.params)
+
+        from nk_manager import launch_nk
+        launch_nk(self.params)
 
     
 
@@ -145,7 +150,10 @@ class Executable(object):
                     self.initialise_input(i,lpu_start,p.Neuron.size)
 
         self.params['graph'] = self.network
-        
+        (n_dict, s_dict) = LPU.graph_to_dicts(self.params['graph'])
+        self.params['n_dict'] = n_dict
+        self.params['s_dict'] = s_dict
+    
 
             
     def initialise_input(self,params,lpu_start,lpu_size):
@@ -157,7 +165,7 @@ class Executable(object):
             self.inputs = nk_utils.TimeVaryingArrayInput(params,lpu_start,lpu_size,self.time,self.inputs)
 
         elif (itype == smlExperiment.ConstantInputType):
-            self.inputs = nk_utils.ConstantInput(params,lpu_start,lpu_size,time,self.inputs)
+            self.inputs = nk_utils.ConstantInput(params,lpu_start,lpu_size,self.time,self.inputs)
 
         elif (itype == smlExperiment.ConstantArrayInputType):
             self.inputs = nk_utils.ConstantArrayInput(params,lpu_start,lpu_size,self.time,self.inputs)
@@ -202,8 +210,20 @@ class Executable(object):
         exp_name = self.bundle.index.keys()[0]
         self.params['components'] = self.bundle.index[exp_name]['component']      
         
-        
+    ###############################################
+    # Added for output testing
+    ##############################################        
     
+    def save_input(self):
+        """ save the input file before running """
+        with h5py.File(self.params['input_file'], 'w') as f:
+            f.create_dataset('array', (self.params['steps'], self.params['num_neurons']),
+                         dtype=np.double,
+                         data=self.inputs)   
+
+    def save_network(self):
+        """ save the network file before running """
+        nx.write_gexf(self.network, self.params['input_file'] +'.gexf.gz')
 
 
 

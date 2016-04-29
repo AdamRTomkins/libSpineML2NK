@@ -107,7 +107,7 @@ def TimeVaryingInput(params,lpu_start,lpu_size,time,inputs):
         if tp_value.value is not None:
             
             for i in params.target_indices:
-                select = np.logical_and(time>=tp_value.time,time<=tp_value.time+params.duration)           
+                select = np.logical_and(time>=units(tp_value.time,'mS'),time<=units(tp_value.time,'mS')+params.duration)           
                 inputs[select,lpu_start:lpu_start+lpu_size] =  tp_value.value
 
         else: # Single spike input

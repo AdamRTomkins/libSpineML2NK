@@ -94,6 +94,7 @@ class SpineMLNeuron(BaseNeuron):
                                      tables.Float64Atom(), (0,self.num_neurons))
 
             # Set up state variables for debugging
+            # every varible is recorded here
             for variable in self.component.Dynamics.StateVariable:
                 exec("self.%s_file = tables.openFile(self.LPU_id + '_%s.h5', mode='w')" % (variable.name,variable.name));
                 exec("self.%s_file.createEArray('/','array', tables.Float64Atom(), (0,self.num_neurons))" % (variable.name));

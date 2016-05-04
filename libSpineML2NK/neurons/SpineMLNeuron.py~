@@ -94,6 +94,7 @@ class SpineMLNeuron(BaseNeuron):
                                      tables.Float64Atom(), (0,self.num_neurons))
 
             # Set up state variables for debugging
+            # every varible is recorded here
             for variable in self.component.Dynamics.StateVariable:
                 exec("self.%s_file = tables.openFile(self.LPU_id + '_%s.h5', mode='w')" % (variable.name,variable.name));
                 exec("self.%s_file.createEArray('/','array', tables.Float64Atom(), (0,self.num_neurons))" % (variable.name));
@@ -193,7 +194,7 @@ __global__ void spine_ml_neuron(
     int nid = bid * NNEU + threadIdx.x;
     %(type)s %(svs_tmp_dec)s %(vars)s %(rp_tmp_vars)s;        // State Variable declarations and variables
     %(port_dec)s                                // Dynamic output port 
-    p
+    
     if( nid < neu_num ){
         // Assign state variables to temporary vars
         %(svs_ass)s         

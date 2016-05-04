@@ -4,7 +4,7 @@
   <Dynamics initial_regime="integrating">
    <Regime name="integrating">
     <TimeDerivative variable="V">
-     <MathInline>((I_Syn) / C) + (Vr - V) / (R*C)</MathInline>
+     <MathInline>((I_Syn) / C) + (Er - V) / (R*C)</MathInline>
     </TimeDerivative>
     <OnCondition target_regime="integrating">
      <StateAssignment variable="V">

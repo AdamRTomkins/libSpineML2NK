@@ -4,21 +4,23 @@
   <Dynamics initial_regime="integrating">
    <Regime name="integrating">
     <TimeDerivative variable="V">
-     <MathInline>((I_Syn) / C) + (Vr - V) / (R*C)</MathInline>
+     <MathInline>((I_Syn) / C) + (Er - V) / (R*C)</MathInline>
     </TimeDerivative>
     <OnCondition target_regime="integrating">
      <StateAssignment variable="V">
       <MathInline>Vr</MathInline>
      </StateAssignment>
+     <EventOut port="spike"/>
      <Trigger>
       <MathInline>V > Vt</MathInline>
      </Trigger>
     </OnCondition>
    </Regime>
    <StateVariable dimension="mV" name="V"/>
+    <StateVariable dimension="mV" name="Er"/>
   </Dynamics>
   <AnalogReducePort dimension="mA" name="I_Syn" reduce_op="+"/>
-  <AnalogSendPort name="V"/>
+  <EventSendPort name="spike"/>
   <Parameter dimension="nS" name="C"/>
   <Parameter dimension="mV" name="Vt"/>
   <Parameter dimension="mV" name="Er"/>

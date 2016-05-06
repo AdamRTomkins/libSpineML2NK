@@ -86,6 +86,8 @@ class SpineMLNeuron(BaseNeuron):
         self._update_I_non_cond = self._get_update_I_non_cond_func()
         self.update = self.get_gpu_kernel()
 
+
+
         if self.debug:
             if self.LPU_id is None:
                 self.LPU_id = "anon"

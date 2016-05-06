@@ -3,10 +3,10 @@
     <LL:Population>
         <LL:Neuron name="Population" size="1" url="NarxReduced.xml">
             <Property name="Am" dimension="?">
-                <FixedValue value="0.0010"/>
+                <FixedValue value="0.0012"/>
             </Property>
             <Property name="Bm" dimension="?">
-                <FixedValue value="-0.9979"/>
+                <FixedValue value="-0.9975"/>
             </Property>
             <Property name="mean_A0" dimension="?">
                 <FixedValue value="0.0001517"/>

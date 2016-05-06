@@ -1023,10 +1023,17 @@ class LPU(Module):
 
         else:
             ## REQUIRE: SpineML generation for graded potential neuronsgraph
-            neuron = self._neuron_classes[ind](
-                n, int(self.V.gpudata) +
-                self.V.dtype.itemsize*self.idx_start_gpot[i],
-                self.dt, debug=self.debug)
+            if t == 'SpineMLNeuron':
+                neuron = self._neuron_classes[ind](
+                    n, int(self.V.gpudata) +
+                    self.V.dtype.itemsize*self.idx_start_gpot[i],
+                    self.dt, debug=self.debug,LPU_id=self.id,component=self.components[n['url'][0]])
+            else:
+                neuron = self._neuron_classes[ind](
+                    n, int(self.V.gpudata) +
+                    self.V.dtype.itemsize*self.idx_start_gpot[i],
+                    self.dt, debug=self.debug)
+
 
         if not neuron.update_I_override:
             baseneuron.BaseNeuron.__init__(

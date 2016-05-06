@@ -187,8 +187,12 @@ class Executable(object):
             external is true, to work with input generation, this will not scale well
       
         """
-        return {'model': 'SpineMLNeuron','name': 'neuron_x','extern': True,'public': False,'spiking': True,'selector': '/a[0]','V':0,"url":model}
-
+        return {'model': 'SpineMLNeuron','name': 'neuron_x','extern': True,'public': False,'spiking': False,'selector': '/a[0]','V':0,"url":model}
+##################################
+#
+#   Swap V out with default parameter from output port
+#
+##################################
 
     def add_neuron(self,model,props,lpu_index,p_index,pop_name):
         """ add a neuron to the gexf population,

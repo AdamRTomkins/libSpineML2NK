@@ -146,7 +146,7 @@ class Executable(object):
             lpu_start = lpu_index;          # Start position for each neuron
 
             for n in np.arange(0,p.Neuron.size):
-                self.add_neuron(p.Neuron.url,p.Neuron.Property,lpu_index,n,p.Neuron.name)
+                self.add_neuron(p.Neuron.url,p.Neuron.Property,lpu_index,n,p.Neuron.name,exp_name)
                 lpu_index +=1
 
             for i in self.bundle.index[exp_name]['experiment'][exp_name].Experiment[0].AbstractInput:
@@ -187,14 +187,9 @@ class Executable(object):
             external is true, to work with input generation, this will not scale well
       
         """
-        return {'model': 'SpineMLNeuron','name': 'neuron_x','extern': True,'public': False,'spiking': False,'selector': '/a[0]','V':0,"url":model}
-##################################
-#
-#   Swap V out with default parameter from output port
-#
-##################################
+        return {'model': 'SpineMLNeuron','name': 'neuron_x','extern': True,'public': False,'spiking': True,'selector': '/a[0]','V':0,"url":model}
 
-    def add_neuron(self,model,props,lpu_index,p_index,pop_name):
+    def add_neuron(self,model,props,lpu_index,p_index,pop_name,exp_name):
         """ add a neuron to the gexf population,
             where p_index is the neuron index within a population
         """
@@ -204,10 +199,31 @@ class Executable(object):
         for p in props:
             """  p example: 'C': {'dimension': 'nS','input':{'type':'FixedValue','value':1}} """
             neuron[p.name] = nk_utils.gen_value(p,p_index)
-            
+         
         neuron['name'] =     'neuron_' +str(lpu_index)  # + '_' + str(p_index)
         neuron['selector'] = '/'+pop_name+'[' +str(lpu_index) +']'    #+ '[' + str(p_index)+']'
-       
+
+        # Determine if the neuron will be spiking or gpot
+        # requires that only one output port exists
+
+        comp = self.bundle.index[exp_name]['component'][model]
+ 
+        for port in comp.ComponentClass.Port:
+            if type(port) is libSpineML.smlComponent.AnalogSendPortType:
+                neuron['spiking'] = False
+                break
+            if type(port) is libSpineML.smlComponent.ImpulseSendPortType:
+                neuron['spiking'] = True
+                break
+
+
+##################################
+#
+#   Swap V out with default parameter from output port
+#
+##################################
+
+
         self.network.add_node(str(lpu_index),attr_dict=neuron)
      
 

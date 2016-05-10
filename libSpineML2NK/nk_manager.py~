@@ -10,12 +10,13 @@ from neurokernel.tools.logging import setup_logger
 from libSpineML2NK.LPU import LPU
 
 
-def launch_nk(params):
+def launch_nk(params,debug=False,device=0,log=False):
     """ Launch Neurokernel
     """
-
-    screen = True
-    logger = setup_logger(file_name=params['name'] +'.log', screen=screen)
+    
+    if log:
+        screen = True
+        logger = setup_logger(file_name=params['name'] +'.log', screen=screen)
     
     man = Manager()
 
@@ -26,8 +27,8 @@ def launch_nk(params):
             params['s_dict'],
             input_file=params['input_file'],
             output_file=params['output_file'],
-            device=0, 
-            debug=True,
+            device=device, 
+            debug=debug,
             components=params['components'])
 
     man.spawn()

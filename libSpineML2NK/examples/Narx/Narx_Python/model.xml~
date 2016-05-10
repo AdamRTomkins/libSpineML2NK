@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LL:SpineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.shef.ac.uk/SpineMLNetworkLayer" xmlns:LL="http://www.shef.ac.uk/SpineMLLowLevelNetworkLayer" xsi:schemaLocation="http://www.shef.ac.uk/SpineMLLowLevelNetworkLayer SpineMLLowLevelNetworkLayer.xsd http://www.shef.ac.uk/SpineMLNetworkLayer SpineMLNetworkLayer.xsd" name="Untitled Project">
+    <LL:Population>
+        <LL:Neuron name="Population" size="1" url="NarxRenamed.xml">
+            <Property name="Am" dimension="?">
+                <FixedValue value="0.0012"/>
+            </Property>
+            <Property name="Bm" dimension="?">
+                <FixedValue value="-0.9975"/>
+            </Property>
+            <Property name="Mean_A_1" dimension="?">
+                <FixedValue value="0.00015174687177639374"/>
+            </Property>
+            <Property name="Mean_B_1" dimension="?">
+                <FixedValue value="-0.9996965062564472"/>
+            </Property>
+            <Property name="Mean_K_1" dimension="?">
+                <FixedValue value="0.0073778950460808802"/>
+            </Property>
+            <Property name="Mean_alpha_1" dimension="?">
+                <FixedValue value="-1.6952757942013319"/>
+            </Property>
+            <Property name="Mean_beta_1" dimension="?">
+                <FixedValue value="56.70165385724556"/>
+            </Property>
+            <Property name="Mean_A_2" dimension="?">
+                <FixedValue value="0.002073155636233452"/>
+            </Property>
+            <Property name="Mean_B_2" dimension="?">
+                <FixedValue value="-0.9958536887275331"/>
+            </Property>
+            <Property name="Mean_K_2" dimension="?">
+                <FixedValue value="0.022266684710357632"/>
+            </Property>
+            <Property name="Mean_alpha_2" dimension="?">
+                <FixedValue value="-1.2384563460468387"/>
+            </Property>
+            <Property name="Mean_beta_2" dimension="?">
+                <FixedValue value="416.19002756957138"/>
+            </Property>
+            <Property name="Mean_A_3" dimension="?">
+                <FixedValue value="0.0003369984766284639"/>
+            </Property>
+            <Property name="Mean_B_3" dimension="?">
+                <FixedValue value="-0.9993260030467431"/>
+            </Property>
+            <Property name="Mean_K_3" dimension="?">
+                <FixedValue value="0.0066009688542815071"/>
+            </Property>
+            <Property name="Mean_alpha_3" dimension="?">
+                <FixedValue value="-1.1660506692817525"/>
+            </Property>
+            <Property name="Mean_beta_3" dimension="?">
+                <FixedValue value="2000"/>
+            </Property>
+            <Property name="bg" dimension="?">
+                <FixedValue value="540"/>
+            </Property>
+            <Property name="Contrast_A_1" dimension="?">
+                <FixedValue value="0.0012003566315597568"/>
+            </Property>
+            <Property name="Contrast_B_1" dimension="?">
+                <FixedValue value="-0.9975992867368805"/>
+            </Property>
+            <Property name="Contrast_K_1" dimension="?">
+                <FixedValue value="1.0000931884041385e-06"/>
+            </Property>
+            <Property name="Contrast_alpha_1" dimension="?">
+                <FixedValue value="-2.2093228258778383"/>
+            </Property>
+            <Property name="Contrast_beta_1" dimension="?">
+                <FixedValue value="6999.9905331388572"/>
+            </Property>
+            <Property name="Contrast_A_2" dimension="?">
+                <FixedValue value="0.0024937657285116362"/>
+            </Property>
+            <Property name="Contrast_B_2" dimension="?">
+                <FixedValue value="-0.9950124685429768"/>
+            </Property>
+            <Property name="Contrast_K_2" dimension="?">
+                <FixedValue value=" 0.017438565232583827"/>
+            </Property>
+            <Property name="Contrast_alpha_2" dimension="?">
+                <FixedValue value="-1.3444700959816109"/>
+            </Property>
+            <Property name="Contrast_beta_2" dimension="?">
+                <FixedValue value="496.14805024208408"/>
+            </Property>
+            <Property name="Contrast_A_3" dimension="?">
+                <FixedValue value="0.0007212041952871236"/>
+            </Property>
+            <Property name="Contrast_B_3" dimension="?">
+                <FixedValue value=" -0.9985575916094257"/>
+            </Property>
+            <Property name="Contrast_K_3" dimension="?">
+                <FixedValue value="0.00053921972167124226"/>
+            </Property>
+            <Property name="Contrast_alpha_3" dimension="?">
+                <FixedValue value="-1.794266702113672"/>
+            </Property>
+            <Property name="Contrast_beta_3" dimension="?">
+                <FixedValue value="3100.0004971668282"/>
+            </Property>
+            <Property name="th0" dimension="?">
+                <FixedValue value="0.866998"/>
+            </Property>
+            <Property name="th1" dimension="?">
+                <FixedValue value="0.0675079"/>
+            </Property>
+            <Property name="th2" dimension="?">
+                <FixedValue value="-91.2843"/>
+            </Property>
+            <Property name="th3" dimension="?">
+                <FixedValue value="0.0248899"/>
+            </Property>
+            <Property name="th4" dimension="?">
+                <FixedValue value="8.17482"/>
+            </Property>
+            <Property name="th5" dimension="?">
+                <FixedValue value="-0.84112"/>
+            </Property>
+            <Property name="th6" dimension="?">
+                <FixedValue value="-1.29035"/>
+            </Property>
+            <Property name="th7" dimension="?">
+                <FixedValue value="-77.9722"/>
+            </Property>
+            <Property name="th8" dimension="?">
+                <FixedValue value="-0.0984691"/>
+            </Property>
+            <Property name="th9" dimension="?">
+                <FixedValue value="0.0235256"/>
+            </Property>
+            <Property name="th10" dimension="?">
+                <FixedValue value="1.74603"/>
+            </Property>
+            <Property name="th11" dimension="?">
+                <FixedValue value="-4.31725"/>
+            </Property>
+            <Property name="th12" dimension="?">
+                <FixedValue value="222.325"/>
+            </Property>
+            <Property name="th13" dimension="?">
+                <FixedValue value="15.9757"/>
+            </Property>
+            <Property name="th14" dimension="?">
+                <FixedValue value="55.9347"/>
+            </Property>
+            <Property name="mu" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="nu" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="mum" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="num" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="um" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_y_1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_ym_1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_f_1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_g_1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_y_2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_ym_2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_f_2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_g_2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_y_3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_ym_3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_f_3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_g_3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Mean_g" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u_hat" dimension="?">
+                <FixedValue value="0.54"/>
+            </Property>
+            <Property name="Contrast_y_1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_ym_1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_f_1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_g_1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_y_2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_ym_2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_f_2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_g_2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_y_3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_ym_3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_f_3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_g_3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Contrast_g" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u_hat_thresh" dimension="?">
+                <FixedValue value="0.54"/>
+            </Property>
+            <Property name="y" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="y1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="y2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="y3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="y4" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="y5" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="y6" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u1" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u2" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u3" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u4" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u5" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u6" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="u7" dimension="?">
+                <FixedValue value="0"/>
+            </Property>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+    </LL:Population>
+</LL:SpineML>

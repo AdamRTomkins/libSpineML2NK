@@ -54,7 +54,8 @@ class Executable(object):
         self.network    = nx.DiGraph()
         self.inputs     = np.zeros((0, 0), dtype=np.double)
         self.time     = np.zeros((0, 0), dtype=np.double)
-
+        self.debug = False
+        self.log = False
 
 
     def execute(self):
@@ -93,9 +94,14 @@ class Executable(object):
         #nk_manager.launch_nk(self.params)
 
         from nk_manager import launch_nk
-        launch_nk(self.params)
-
     
+        launch_nk(self.params,self.debug,self.log)
+
+    def set_debug(self, debug=True):
+        self.debug = debug
+
+    def set_log(self,log=True):
+        self.log = log
 
     def process_experiment(self,bundleIndex=0,expIndex=0):
         """Process to the experiment file to extract NK relevant objects

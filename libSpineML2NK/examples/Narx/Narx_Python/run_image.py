@@ -2,17 +2,23 @@ import neurokernel.mpi_relaunch
 import scipy.io as io
 from libSpineML2NK import nk_executable
 from libSpineML import smlExperiment
+import numpy as np
+import pdb
+import h5py
+
 e = nk_executable.Executable('./experiment0.xml')
 
 exp = e.bundle.experiments[0].Experiment[0]
 ai = exp.AbstractInput[0]
 
-mutant = io.loadmat('data/MutantBG6Data.mat')
-m_input = mutant['recorded_input'][4000:36000,0]
+
+
+
+m_input = h5py.File("data/image_demo_input.h5")["array"][:]
 
 net = e.bundle.networks[0]
 pop = net.Population[0]
-pop.Neuron.Property
+pop.Neuron.Property 
 
 
 pars = {
@@ -84,28 +90,43 @@ pars = {
 }
 
 
-
-
+model     = io.loadmat("../data/MutantModel.mat") 
+theta     = np.ravel(model['mutantNARXparamsBG6'])
 
 
 # Overwrite default values with Python Script Values
 for prop in pop.Neuron.Property:
     if prop.name in pars:
         prop.AbstractValue.value = pars[prop.name]
+        print "Replaced %s" % prop.name
     else:
         # Set initial values:
-        if prop.name == 'Contrast_ym_1':
+        if prop.name == 'Contrast_ym_1':    
             prop.AbstractValue.value = pars['Contrast_X0_1']
+            print "Replaced %s" % prop.name
         if prop.name == 'Contrast_ym_2':
             prop.AbstractValue.value = pars['Contrast_X0_2']
+            print "Replaced %s" % prop.name
         if prop.name == 'Contrast_ym_3':
             prop.AbstractValue.value = pars['Contrast_X0_3']
+            print "Replaced %s" % prop.name
         if prop.name == 'Mean_ym_1':
             prop.AbstractValue.value = pars['Mean_X0_1']
+            print "Replaced %s" % prop.name
         if prop.name == 'Mean_ym_2':
             prop.AbstractValue.value = pars['Mean_X0_2']
+            print "Replaced %s" % prop.name
         if prop.name == 'Mean_ym_3':
             prop.AbstractValue.value = pars['Mean_X0_3']
+            print "Replaced %s" % prop.name
+        if prop.name[0:2] == 'th':
+            # Inject Narx Parameters
+            num = int(prop.name[-(len(prop.name)-2): len(prop.name)])
+            prop.AbstractValue.value = float(theta[num])
+            print "Replaced %s" % theta[num]
+   
+ 
+    print prop.name + " is " + str(prop.AbstractValue.value) 
 
 # Saturate Input! Nothing below 1e-10
 m_input[m_input < 1e-10] =1e-10
@@ -119,6 +140,32 @@ for time, inj in enumerate(m_input):
 
 exp.Simulation.duration = len(m_input)/1000.0
 
+e.set_debug()
 e.execute()
+
+from matplotlib import pyplot as plt
+import matplotlib.cm as cm
+import h5py
+import numpy as np
+
+f  = h5py.File('output_gpot.h5')
+g  = h5py.File('input.h5')
+
+f_plot_data = (np.array(f.values())).astype(np.float32)
+input_data = (np.array(g.values())).astype(np.float32)
+
+plot_data = (f_plot_data/np.max(f_plot_data))*256
+plot_data = plot_data.astype(np.int)
+
+
+f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+ax1.imshow(input_data[0,:,:].reshape(200,200), cmap = cm.Greys_r);
+ax1.set_title('Input Data')
+ax2.imshow(plot_data[0,:,:].reshape(200,200),  cmap = cm.Greys_r);
+ax2.set_title('Gpot Data')
+#plt.colorbar()
+plt.show()
+
+
 
 

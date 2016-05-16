@@ -238,13 +238,14 @@ def sortGainParams(Params,VarName):
 if __name__ == "__main__":    
     
     wild_or_mutant = 'mutant'
+    wild_or_mutant = 'wild'    
     ImageProcessing = 'n'
     
     if(wild_or_mutant=='wild'):
-        Params    = scipy.io.loadmat("C:\\Users\\uos\\Google Drive\\PHD_2014\\PR_Jan\\intpoint_wild8.mat")    
+        Params    = scipy.io.loadmat("intpoint_wild8.mat")    
         SortedPar = sortGainParams(Params,'x_wild8')        
-        model     = scipy.io.loadmat("C:\\Users\\uos\\Google Drive\\PHD_2014\\PR_Jan\\WildModel.mat")
-        inoutData = scipy.io.loadmat("C:\\Users\\uos\\Google Drive\\PHD_2014\\PR_Jan\\WildInputOutput.mat")
+        model     = scipy.io.loadmat("WildModel.mat")
+        inoutData = scipy.io.loadmat("WildInputOutput.mat")
         theta = np.ravel(model['wildNARXparamsBG6'])
         structure = model['wildNARXstructure']
         U_input = inoutData['Wild_Input']

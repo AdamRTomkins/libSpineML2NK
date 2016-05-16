@@ -2,14 +2,19 @@ import neurokernel.mpi_relaunch
 import scipy.io as io
 from libSpineML2NK import nk_executable
 from libSpineML import smlExperiment
-import h5py
+import numpy as np
+import pdb
 e = nk_executable.Executable('./experiment0.xml')
 
 exp = e.bundle.experiments[0].Experiment[0]
 ai = exp.AbstractInput[0]
 
-clean_input = h5py.File('data/Narx__sigma_0.5__0.4__clean_pulses.h5')['array'][:]
-clean_input_tilde = h5py.File('data/Narx__sigma_0.5__0.4__clean_pulses.h5')['array'][:]
+mutant = io.loadmat('data/MutantBG6Data.mat')
+
+m_input = mutant['recorded_input'][0:36000,0]
+l = m_input.tolist()
+l.insert(0,0)
+m_input = np.array(l)
 
 
 net = e.bundle.networks[0]
@@ -86,8 +91,8 @@ pars = {
 }
 
 
-
-
+model     = io.loadmat("../data/MutantModel.mat")
+theta     = np.ravel(model['mutantNARXparamsBG6'])
 
 
 # Overwrite default values with Python Script Values
@@ -115,23 +120,26 @@ for prop in pop.Neuron.Property:
         if prop.name == 'Mean_ym_3':
             prop.AbstractValue.value = pars['Mean_X0_3']
             print "Replaced %s" % prop.name
-        if prop.name == 'um###':
-            prop.AbstractValue.value = m_input_X0
-            print "Replaced %s" % prop.name
+        if prop.name[0:2] == 'th':
+            # Inject Narx Parameters
+            num = int(prop.name[-(len(prop.name)-2): len(prop.name)])
+            prop.AbstractValue.value = float(theta[num])
+            print "Replaced %s" % theta[num]
+   
+ 
+    #print prop.name + " is " + str(prop.AbstractValue.value) 
 
-
-    print prop.name + " is " + str(prop.AbstractValue.value) 
-
-
+# Saturate Input! Nothing below 1e-10
+m_input[m_input < 1e-10] =1e-10
 
 #Rewrite Input Dynamically from mutant data
 ai.TimePointValue = []      # Get rid of default input
 
-for time, inj in enumerate(clean_input):
+for time, inj in enumerate(m_input):
     tp = smlExperiment.TimePointValueType(time=time,value=inj)
     ai.add_TimePointValue(tp)
 
-exp.Simulation.duration = 5 #len(m_input)/1000.0
+exp.Simulation.duration = len(m_input)/1000.0
 
 e.set_debug()
 e.execute()

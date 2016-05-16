@@ -127,7 +127,7 @@ for prop in pop.Neuron.Property:
             print "Replaced %s" % theta[num]
    
  
-    print prop.name + " is " + str(prop.AbstractValue.value) 
+    #print prop.name + " is " + str(prop.AbstractValue.value) 
 
 # Saturate Input! Nothing below 1e-10
 m_input[m_input < 1e-10] =1e-10

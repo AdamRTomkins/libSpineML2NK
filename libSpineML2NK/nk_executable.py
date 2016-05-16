@@ -41,17 +41,23 @@ class Executable(object):
     """
 
     def __init__(self, experiment=None):
+        self.params     = {}
         if type(experiment) is str:
             self.bundle = smlBundle.Bundle()
             self.bundle.add_experiment(experiment,True)
+            exp = self.bundle.experiments[0].Experiment[0]
+            self.params['name'] = exp.get_name()
 
         elif type(experiment) is smlBundle.Bundle:
             self.bundle = experiment
-
+            exp = self.bundle.experiments[0].Experiment[0] 
+            self.params['name'] = exp.get_name()
         else:
             self.bundle = smlBundle.Bundle()
-        self.params     = {}
-        self.network    = nx.DiGraph()
+            self.params['name'] = 'No_name'
+       
+        self.network    = nx.MultiDiGraph()
+        #self.network    = nx.DiGraph()
         self.inputs     = np.zeros((0, 0), dtype=np.double)
         self.time     = np.zeros((0, 0), dtype=np.double)
         self.debug = False
@@ -76,8 +82,8 @@ class Executable(object):
             params['steps']
         """
         
-        self.params['input_file'] = 'input.h5'
-        self.params['output_file'] = 'output.h5'
+        self.params['input_file'] = self.params['name'] + '_input.h5'
+        self.params['output_file'] = self.params['name'] + '_output.h5'
 
         self.process_experiment()
         self.process_network()
@@ -123,7 +129,7 @@ class Executable(object):
 
         for n in self.bundle.networks[0].Population:
             self.params['num_neurons']+= n.Neuron.size
-
+        pdb.set_trace()
 ######################################################################
 # Correct dt and time to be in standard
 #####################################################################
@@ -168,7 +174,7 @@ class Executable(object):
             
     def initialise_input(self,params,lpu_start,lpu_size):
         # initialise an input in the matrix for a given input to a population  
-
+        pdb.set_trace()
         itype =  type(params)
 
         if (itype == smlExperiment.TimeVaryingArrayInputType):

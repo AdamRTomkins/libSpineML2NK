@@ -15,7 +15,7 @@ def gen_value(prop,index=0):
 
         elif type(prop.AbstractValue) == smlNetwork.ValueListType:
             values =  prop.AbstractValue.Value
-            value = values[index]
+            value = values[index].value
         else:
             raise TypeError('Property Abstract Value type: %s not recognized' % str(type(prop.AbstractValue)))                
         
@@ -183,15 +183,17 @@ def TimeVaryingArrayInput(params,lpu_start,lpu_size,time,inputs):
 
         else:
         """
-
+        
         if tpa_value.array_value is not None:
-            for array_time, value in zip(tpa_value.array_time,tpa_value.array_value):
-                inputs[time>=units(array_time,'mS'),lpu_start+int(tpa_value.index)] = value
+            
+            for array_time, value in zip(tpa_value.array_time.split(','),tpa_value.array_value.split(',')):
+               
+                inputs[time>=units(float(array_time),'mS'),lpu_start+int(tpa_value.index)] = float(value)
 
 
         else: 
-            for array_time in tpa_value.array_time:
-                inputs[time==array_time,lpu_start+int(tpa_value.index)] = 1
+            for array_time in tpa_value.array_time.split(','):
+                inputs[time==float(array_time),lpu_start+int(tpa_value.index)] = 1
     return inputs
 
 

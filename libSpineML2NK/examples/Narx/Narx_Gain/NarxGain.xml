@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <SpineML xsi:schemaLocation="http://www.shef.ac.uk/SpineMLComponentLayer SpineMLComponentLayer.xsd" xmlns="http://www.shef.ac.uk/SpineMLComponentLayer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
- <ComponentClass type="neuron_body" name="NarxRenamed">
+ <ComponentClass type="neuron_body" name="NarxGain">
   <Dynamics initial_regime="loop">
    <Regime name="loop">
     <OnCondition target_regime="loop">
@@ -20,7 +20,7 @@
       <MathInline>Mean_K_1 * pow(((Mean_y_1)),Mean_alpha_1)</MathInline>
      </StateAssignment>
      <StateAssignment variable="Mean_g_1">
-      <MathInline>(Mean_beta_1+((((Mean_f_1*1000) - Mean_B_1))/(1+exp(((Mean_f_1*1000) -Mean_B_1)))))/1000</MathInline>
+      <MathInline>(Mean_beta_1+((((Mean_f_1*1000) - Mean_beta_1))/(1+exp(((Mean_f_1*1000) -Mean_beta_1)))))/1000</MathInline>
      </StateAssignment>
      <StateAssignment variable="Mean_y_2">
       <MathInline>(Mean_A_2*(u + um))-(Mean_B_2*(Mean_ym_2))</MathInline>
@@ -29,7 +29,7 @@
       <MathInline>Mean_K_2 * pow(((Mean_y_2)),Mean_alpha_2)</MathInline>
      </StateAssignment>
      <StateAssignment variable="Mean_g_2">
-      <MathInline>(Mean_beta_2+((((Mean_f_2*1000) - Mean_B_2))/(1+exp(((Mean_f_2*1000) -Mean_B_2)))))/1000</MathInline>
+      <MathInline>(Mean_beta_2+((((Mean_f_2*1000) - Mean_beta_2))/(1+exp(((Mean_f_2*1000) -Mean_beta_2)))))/1000</MathInline>
      </StateAssignment>
      <StateAssignment variable="Mean_y_3">
       <MathInline>(Mean_A_3*(u+um))-(Mean_B_3*(Mean_ym_3))</MathInline>
@@ -38,7 +38,7 @@
       <MathInline>Mean_K_3 * pow(((Mean_y_3)),Mean_alpha_3)</MathInline>
      </StateAssignment>
      <StateAssignment variable="Mean_g_3">
-      <MathInline>(Mean_beta_3+((((Mean_f_3*1000) - Mean_B_3))/(1+exp(((Mean_f_3*1000) -Mean_B_3)))))/1000</MathInline>
+      <MathInline>(Mean_beta_3+((((Mean_f_3*1000) - Mean_beta_3))/(1+exp(((Mean_f_3*1000) -Mean_beta_3)))))/1000</MathInline>
      </StateAssignment>
      <StateAssignment variable="Mean_ym_2">
       <MathInline>Mean_y_2</MathInline>
@@ -56,7 +56,7 @@
       <MathInline>Contrast_K_1* pow(((Contrast_y_1)),Contrast_alpha_1)</MathInline>
      </StateAssignment>
      <StateAssignment variable="Contrast_g_1">
-      <MathInline>(Contrast_beta_1+((((Contrast_f_1*1000) - Contrast_B_1))/(1+exp(((Contrast_f_1*1000) -Contrast_B_1)))))/1000
+      <MathInline>(Contrast_beta_1+((((Contrast_f_1*1000) - Contrast_beta_1))/(1+exp(((Contrast_f_1*1000) -Contrast_beta_1)))))/1000
 </MathInline>
      </StateAssignment>
      <StateAssignment variable="Contrast_y_2">
@@ -66,7 +66,7 @@
       <MathInline>Contrast_K_2 * pow(((Contrast_y_2)),Contrast_alpha_2)</MathInline>
      </StateAssignment>
      <StateAssignment variable="Contrast_g_2">
-      <MathInline>(Contrast_beta_2+((((Contrast_f_2*1000) - Contrast_B_2))/(1+exp(((Contrast_f_2*1000) -Contrast_B_2)))))/1000</MathInline>
+      <MathInline>(Contrast_beta_2+((((Contrast_f_2*1000) - Contrast_beta_2))/(1+exp(((Contrast_f_2*1000) -Contrast_beta_2)))))/1000</MathInline>
      </StateAssignment>
      <StateAssignment variable="Contrast_y_3">
       <MathInline>(Contrast_A_3*(u+um))-(Contrast_B_3*(Contrast_ym_3))</MathInline>
@@ -75,7 +75,7 @@
       <MathInline>Contrast_K_3 * pow(((Contrast_y_3)),Contrast_alpha_3)</MathInline>
      </StateAssignment>
      <StateAssignment variable="Contrast_g_3">
-      <MathInline>(Contrast_beta_3+((((Contrast_f_3*1000) - Contrast_B_3))/(1+exp(((Contrast_f_3*1000) -Contrast_B_3)))))/1000
+      <MathInline>(Contrast_beta_3+((((Contrast_f_3*1000) - Contrast_beta_3))/(1+exp(((Contrast_f_3*1000) -Contrast_beta_3)))))/1000
 </MathInline>
      </StateAssignment>
      <StateAssignment variable="Contrast_ym_2">
@@ -85,12 +85,12 @@
       <MathInline>Contrast_y_3</MathInline>
      </StateAssignment>
      <StateAssignment variable="Contrast_g">
-      <MathInline>Contrast_g_1+Contrast_g_2+Contrast_g_3</MathInline>
+      <MathInline>(Gain_Switch * (Contrast_g_1+Contrast_g_2+Contrast_g_3)) + (pow((Gain_Switch-1),2) * (Gain_Overide))</MathInline>
      </StateAssignment>
      <StateAssignment variable="u_hat">
       <MathInline>mu*Mean_g + nu*Contrast_g</MathInline>
      </StateAssignment>
-     <StateAssignment variable="u_hat_prime">
+     <StateAssignment variable="u_hat_thresh">
       <MathInline>(bg+(((u_hat*1000)-bg)/(1+exp((u_hat*1000)-bg))))/1000</MathInline>
      </StateAssignment>
      <StateAssignment variable="Contrast_ym_1">
@@ -124,7 +124,7 @@
       <MathInline>u1</MathInline>
      </StateAssignment>
      <StateAssignment variable="u1">
-      <MathInline>u_hat_prime</MathInline>
+      <MathInline>u_hat_thresh</MathInline>
      </StateAssignment>
      <StateAssignment variable="y6">
       <MathInline>y5</MathInline>
@@ -184,7 +184,7 @@
    <StateVariable dimension="?" name="Contrast_f_3"/>
    <StateVariable dimension="?" name="Contrast_g_3"/>
    <StateVariable dimension="?" name="Contrast_g"/>
-   <StateVariable dimension="?" name="u_hat_prime"/>
+   <StateVariable dimension="?" name="u_hat_thresh"/>
    <StateVariable dimension="?" name="y"/>
    <StateVariable dimension="?" name="y1"/>
    <StateVariable dimension="?" name="y2"/>
@@ -250,5 +250,7 @@
   <Parameter dimension="?" name="th12"/>
   <Parameter dimension="?" name="th13"/>
   <Parameter dimension="?" name="th14"/>
+  <Parameter dimension="?" name="Gain_Switch"/>
+  <Parameter dimension="?" name="Gain_Overide"/>
  </ComponentClass>
 </SpineML>

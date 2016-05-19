@@ -129,7 +129,7 @@ class Executable(object):
 
         for n in self.bundle.networks[0].Population:
             self.params['num_neurons']+= n.Neuron.size
-        pdb.set_trace()
+  
 ######################################################################
 # Correct dt and time to be in standard
 #####################################################################
@@ -174,7 +174,7 @@ class Executable(object):
             
     def initialise_input(self,params,lpu_start,lpu_size):
         # initialise an input in the matrix for a given input to a population  
-        pdb.set_trace()
+
         itype =  type(params)
 
         if (itype == smlExperiment.TimeVaryingArrayInputType):

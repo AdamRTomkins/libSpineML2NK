@@ -5,6 +5,7 @@ from libSpineML import smlExperiment
 import numpy as np
 import pdb
 import h5py
+import cv2
 
 e = nk_executable.Executable('./experiment1.xml')
 
@@ -12,15 +13,22 @@ exp = e.bundle.experiments[0].Experiment[0]
 ai = exp.AbstractInput[0]
 
 
+in_file = 'data/Leaf.jpeg'
+in_file = 'data/LeafF.jpg'
+in_file = 'data/Grass.JPG'
+in_file = 'data/Forest_Eq.jpg'
 
+m_input = cv2.imread(in_file,cv2.CV_LOAD_IMAGE_GRAYSCALE).astype(np.float32)
+scale = 0.2
+m_input  = ((1.0*m_input) / 256) * scale
 
-m_input = h5py.File("data/image_demo_input.h5")["array"][:]
+if m_input.shape[0] < m_input.shape[1]:
+    m_input = np.array(zip(*m_input[::-1]))
 
 
 net = e.bundle.networks[0]
 pop = net.Population[0]
 pop.Neuron.Property 
-
 
 pars = {
  'Contrast_K_1': 1.0000931884041385e-06,
@@ -131,27 +139,42 @@ for prop in pop.Neuron.Property:
 
 
 #Rewrite Input Dynamically from mutant data
-ai.TimePointValue = []      # Get rid of default input
+ai.TimePointArrayValue = []      # Get rid of default input
+
+e.bundle.networks[0].Population[0].Neuron.size = m_input.shape[0]
 
 
+time_list = ','.join(map(str, np.arange(m_input.shape[1])))
 
+for i in np.arange(m_input.shape[0]):
+    value_list = ','.join(map(str, m_input[i,:]))
+    tp = smlExperiment.TimePointArrayValueType(index=i,array_time=time_list,array_value=value_list)
+    ai.add_TimePointArrayValue(tp)
+exp.Simulation.duration = m_input.shape[1]/1000.0
 
-for time, inj in enumerate(m_input):
-    tp = smlExperiment.TimePointValueType(time=time,value=inj)
-    ai.add_TimePointValue(tp)
-
-exp.Simulation.duration = len(m_input)/1000.0
+print "Duration = %s steps" % exp.Simulation.duration
 
 e.set_debug()
+
 e.execute()
+
+# Plotting
+
 
 from matplotlib import pyplot as plt
 import matplotlib.cm as cm
 import h5py
 import numpy as np
+"""
+f  = h5py.File('MultipleInputs_output_gpot.h5')['array'][:]
+g  = h5py.File('MultipleInputs_input.h5')['array'][:]
 
-f  = h5py.File('output_gpot.h5')
-g  = h5py.File('input.h5')
+f_plot_data = (np.array(f)).astype(np.float32)
+input_data = (np.array(g)).astype(np.float32)
+"""
+
+f  = h5py.File('MultipleInputs_output_gpot.h5')
+g  = h5py.File('MultipleInputs_input.h5')
 
 f_plot_data = (np.array(f.values())).astype(np.float32)
 input_data = (np.array(g.values())).astype(np.float32)
@@ -159,15 +182,28 @@ input_data = (np.array(g.values())).astype(np.float32)
 plot_data = (f_plot_data/np.max(f_plot_data))*256
 plot_data = plot_data.astype(np.int)
 
-
-f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
-ax1.imshow(input_data[0,:,:].reshape(200,200), cmap = cm.Greys_r);
+f, (ax1, ax2) = plt.subplots(1, 2)
+ax1.imshow(input_data[0,:,:].reshape(plot_data.shape[1],plot_data.shape[2]), cmap = cm.Greys_r);
 ax1.set_title('Input Data')
-ax2.imshow(plot_data[0,:,:].reshape(200,200),  cmap = cm.Greys_r);
+ax1.set_ylim([-0.5,m_input.shape[1]])
+ax1.set_xlim([-0.5,m_input.shape[0]])
+
+ax2.imshow(plot_data[0,:,:].reshape(plot_data.shape[1],plot_data.shape[2]),  cmap = cm.Greys_r);
 ax2.set_title('Gpot Data')
+ax2.set_ylim([-0.5,m_input.shape[1]])
+ax2.set_xlim([-0.5,m_input.shape[0]])
 #plt.colorbar()
 plt.show()
 
+f, (ax2) = plt.subplots(1, 1)
+ax2.imshow(plot_data[0,:,:].reshape(plot_data.shape[1],plot_data.shape[2]),  cmap = cm.Greys_r);
+ax2.set_title('Gpot Data')
+ax2.set_ylim([-0.5,m_input.shape[1]])
+ax2.set_xlim([-0.5,m_input.shape[0]])
+plt.show()
 
 
+png_writer = png.Writer(width = m_input.shape[1], height = m_input.shape[0], greyscale=True)
+
+png_writer.write(open('colors_panel.png', 'wb'), m_input)
 

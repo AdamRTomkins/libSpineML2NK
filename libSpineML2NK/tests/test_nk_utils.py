@@ -155,7 +155,7 @@ def test_TimeVaryingArrayInput():
     import numpy as np
     from libSpineML2NK import nk_executable
 
-    tva1 = smlExperiment.TimePointArrayValueType(array_time = [0,0.5],array_value = [2,0],index=0)
+    tva1 = smlExperiment.TimePointArrayValueType(array_time = "0,0.5",array_value = "2,0",index=0)
 
     tvait = smlExperiment.TimeVaryingArrayInputType(start_time = 0,duration = 1,array_size = 2, TimePointArrayValue = [tva1])
 

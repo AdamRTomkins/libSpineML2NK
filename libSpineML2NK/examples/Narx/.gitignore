@@ -1,0 +1,6 @@
+*.h5
+*.gexf.gz
+*.log
+*.tar.gz
+data/
+Narx_Pulses/

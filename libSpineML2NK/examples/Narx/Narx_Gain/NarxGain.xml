@@ -1,0 +1,255 @@
+<?xml version="1.0"?>
+<SpineML xsi:schemaLocation="http://www.shef.ac.uk/SpineMLComponentLayer SpineMLComponentLayer.xsd" xmlns="http://www.shef.ac.uk/SpineMLComponentLayer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <ComponentClass type="neuron_body" name="NarxGain">
+  <Dynamics initial_regime="loop">
+   <Regime name="loop">
+    <OnCondition target_regime="loop">
+     <StateAssignment variable="mu">
+      <MathInline>(Am*(u+um))-(Bm*(mum))</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="nu">
+      <MathInline>u-mu</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_y_1">
+      <MathInline>(Mean_A_1*(u+um))-(Mean_B_1*(Mean_ym_1))</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_y_1">
+      <MathInline>(Contrast_A_1*(u+um))-(Contrast_B_1*(Contrast_ym_1))</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_f_1">
+      <MathInline>Mean_K_1 * pow(((Mean_y_1)),Mean_alpha_1)</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_g_1">
+      <MathInline>(Mean_beta_1+((((Mean_f_1*1000) - Mean_beta_1))/(1+exp(((Mean_f_1*1000) -Mean_beta_1)))))/1000</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_y_2">
+      <MathInline>(Mean_A_2*(u + um))-(Mean_B_2*(Mean_ym_2))</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_f_2">
+      <MathInline>Mean_K_2 * pow(((Mean_y_2)),Mean_alpha_2)</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_g_2">
+      <MathInline>(Mean_beta_2+((((Mean_f_2*1000) - Mean_beta_2))/(1+exp(((Mean_f_2*1000) -Mean_beta_2)))))/1000</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_y_3">
+      <MathInline>(Mean_A_3*(u+um))-(Mean_B_3*(Mean_ym_3))</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_f_3">
+      <MathInline>Mean_K_3 * pow(((Mean_y_3)),Mean_alpha_3)</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_g_3">
+      <MathInline>(Mean_beta_3+((((Mean_f_3*1000) - Mean_beta_3))/(1+exp(((Mean_f_3*1000) -Mean_beta_3)))))/1000</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_ym_2">
+      <MathInline>Mean_y_2</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_ym_3">
+      <MathInline>Mean_y_3</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_g">
+      <MathInline>Mean_g_1+Mean_g_2+Mean_g_3</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Mean_ym_1">
+      <MathInline>Mean_y_1</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_f_1">
+      <MathInline>Contrast_K_1* pow(((Contrast_y_1)),Contrast_alpha_1)</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_g_1">
+      <MathInline>(Contrast_beta_1+((((Contrast_f_1*1000) - Contrast_beta_1))/(1+exp(((Contrast_f_1*1000) -Contrast_beta_1)))))/1000
+</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_y_2">
+      <MathInline>(Contrast_A_2*(u + um))-(Contrast_B_2*(Contrast_ym_2))</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_f_2">
+      <MathInline>Contrast_K_2 * pow(((Contrast_y_2)),Contrast_alpha_2)</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_g_2">
+      <MathInline>(Contrast_beta_2+((((Contrast_f_2*1000) - Contrast_beta_2))/(1+exp(((Contrast_f_2*1000) -Contrast_beta_2)))))/1000</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_y_3">
+      <MathInline>(Contrast_A_3*(u+um))-(Contrast_B_3*(Contrast_ym_3))</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_f_3">
+      <MathInline>Contrast_K_3 * pow(((Contrast_y_3)),Contrast_alpha_3)</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_g_3">
+      <MathInline>(Contrast_beta_3+((((Contrast_f_3*1000) - Contrast_beta_3))/(1+exp(((Contrast_f_3*1000) -Contrast_beta_3)))))/1000
+</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_ym_2">
+      <MathInline>Contrast_y_2</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_ym_3">
+      <MathInline>Contrast_y_3</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_g">
+      <MathInline>(Contrast_g_1+Contrast_g_2+Contrast_g_3)</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u_hat">
+      <MathInline>mu*Mean_g + nu*Contrast_g</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u_hat_thresh">
+      <MathInline>(bg+(((u_hat*1000)-bg)/(1+exp((u_hat*1000)-bg))))/1000</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="Contrast_ym_1">
+      <MathInline>Contrast_y_1</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="um">
+      <MathInline>u</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="mum">
+      <MathInline>mu</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="num">
+      <MathInline>nu</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u7">
+      <MathInline>u6</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u6">
+      <MathInline>u5</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u5">
+      <MathInline>u4</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u4">
+      <MathInline>u3</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u3">
+      <MathInline>u2</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u2">
+      <MathInline>u1</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="u1">
+      <MathInline>u_hat_thresh</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="y6">
+      <MathInline>y5</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="y5">
+      <MathInline>y4</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="y4">
+      <MathInline>y3</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="y3">
+      <MathInline>y2</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="y2">
+      <MathInline>y1</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="y1">
+      <MathInline>y</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="y">
+      <MathInline>th0 *y1+th1 *y3+th2 *u5*u4+th3+th4 *u6 +th5 *u4*y6+th6 *u7 +th7 *u7*u6+th8 *y4 +th9 *y5 +th10*u4*y5+th11*u4*y2+th12*u7*u3+th13*u5 +th14*u4</MathInline>
+     </StateAssignment>
+     <Trigger>
+      <MathInline>1==1</MathInline>
+     </Trigger>
+    </OnCondition>
+   </Regime>
+   <StateVariable dimension="?" name="mu"/>
+   <StateVariable dimension="?" name="nu"/>
+   <StateVariable dimension="?" name="mum"/>
+   <StateVariable dimension="?" name="num"/>
+   <StateVariable dimension="?" name="um"/>
+   <StateVariable dimension="?" name="Mean_y_1"/>
+   <StateVariable dimension="?" name="Mean_ym_1"/>
+   <StateVariable dimension="?" name="Mean_f_1"/>
+   <StateVariable dimension="?" name="Mean_g_1"/>
+   <StateVariable dimension="?" name="Mean_y_2"/>
+   <StateVariable dimension="?" name="Mean_ym_2"/>
+   <StateVariable dimension="?" name="Mean_f_2"/>
+   <StateVariable dimension="?" name="Mean_g_2"/>
+   <StateVariable dimension="?" name="Mean_y_3"/>
+   <StateVariable dimension="?" name="Mean_ym_3"/>
+   <StateVariable dimension="?" name="Mean_f_3"/>
+   <StateVariable dimension="?" name="Mean_g_3"/>
+   <StateVariable dimension="?" name="Mean_g"/>
+   <StateVariable dimension="?" name="u_hat"/>
+   <StateVariable dimension="?" name="Contrast_y_1"/>
+   <StateVariable dimension="?" name="Contrast_ym_1"/>
+   <StateVariable dimension="?" name="Contrast_f_1"/>
+   <StateVariable dimension="?" name="Contrast_g_1"/>
+   <StateVariable dimension="?" name="Contrast_y_2"/>
+   <StateVariable dimension="?" name="Contrast_ym_2"/>
+   <StateVariable dimension="?" name="Contrast_f_2"/>
+   <StateVariable dimension="?" name="Contrast_g_2"/>
+   <StateVariable dimension="?" name="Contrast_y_3"/>
+   <StateVariable dimension="?" name="Contrast_ym_3"/>
+   <StateVariable dimension="?" name="Contrast_f_3"/>
+   <StateVariable dimension="?" name="Contrast_g_3"/>
+   <StateVariable dimension="?" name="Contrast_g"/>
+   <StateVariable dimension="?" name="u_hat_thresh"/>
+   <StateVariable dimension="?" name="y"/>
+   <StateVariable dimension="?" name="y1"/>
+   <StateVariable dimension="?" name="y2"/>
+   <StateVariable dimension="?" name="y3"/>
+   <StateVariable dimension="?" name="y4"/>
+   <StateVariable dimension="?" name="y5"/>
+   <StateVariable dimension="?" name="y6"/>
+   <StateVariable dimension="?" name="u1"/>
+   <StateVariable dimension="?" name="u2"/>
+   <StateVariable dimension="?" name="u3"/>
+   <StateVariable dimension="?" name="u4"/>
+   <StateVariable dimension="?" name="u5"/>
+   <StateVariable dimension="?" name="u6"/>
+   <StateVariable dimension="?" name="u7"/>
+  </Dynamics>
+  <AnalogReducePort dimension="?" name="u" reduce_op="+"/>
+  <AnalogSendPort name="y"/>
+  <Parameter dimension="?" name="Am"/>
+  <Parameter dimension="?" name="Bm"/>
+  <Parameter dimension="?" name="Mean_A_1"/>
+  <Parameter dimension="?" name="Mean_B_1"/>
+  <Parameter dimension="?" name="Mean_K_1"/>
+  <Parameter dimension="?" name="Mean_alpha_1"/>
+  <Parameter dimension="?" name="Mean_beta_1"/>
+  <Parameter dimension="?" name="Mean_A_2"/>
+  <Parameter dimension="?" name="Mean_B_2"/>
+  <Parameter dimension="?" name="Mean_K_2"/>
+  <Parameter dimension="?" name="Mean_alpha_2"/>
+  <Parameter dimension="?" name="Mean_beta_2"/>
+  <Parameter dimension="?" name="Mean_A_3"/>
+  <Parameter dimension="?" name="Mean_B_3"/>
+  <Parameter dimension="?" name="Mean_K_3"/>
+  <Parameter dimension="?" name="Mean_alpha_3"/>
+  <Parameter dimension="?" name="Mean_beta_3"/>
+  <Parameter dimension="?" name="bg"/>
+  <Parameter dimension="?" name="Contrast_A_1"/>
+  <Parameter dimension="?" name="Contrast_B_1"/>
+  <Parameter dimension="?" name="Contrast_K_1"/>
+  <Parameter dimension="?" name="Contrast_alpha_1"/>
+  <Parameter dimension="?" name="Contrast_beta_1"/>
+  <Parameter dimension="?" name="Contrast_A_2"/>
+  <Parameter dimension="?" name="Contrast_B_2"/>
+  <Parameter dimension="?" name="Contrast_K_2"/>
+  <Parameter dimension="?" name="Contrast_alpha_2"/>
+  <Parameter dimension="?" name="Contrast_beta_2"/>
+  <Parameter dimension="?" name="Contrast_A_3"/>
+  <Parameter dimension="?" name="Contrast_B_3"/>
+  <Parameter dimension="?" name="Contrast_K_3"/>
+  <Parameter dimension="?" name="Contrast_alpha_3"/>
+  <Parameter dimension="?" name="Contrast_beta_3"/>
+  <Parameter dimension="?" name="th0"/>
+  <Parameter dimension="?" name="th1"/>
+  <Parameter dimension="?" name="th2"/>
+  <Parameter dimension="?" name="th3"/>
+  <Parameter dimension="?" name="th4"/>
+  <Parameter dimension="?" name="th5"/>
+  <Parameter dimension="?" name="th6"/>
+  <Parameter dimension="?" name="th7"/>
+  <Parameter dimension="?" name="th8"/>
+  <Parameter dimension="?" name="th9"/>
+  <Parameter dimension="?" name="th10"/>
+  <Parameter dimension="?" name="th11"/>
+  <Parameter dimension="?" name="th12"/>
+  <Parameter dimension="?" name="th13"/>
+  <Parameter dimension="?" name="th14"/>
+  <Parameter dimension="?" name="Gain_Overide"/>
+ </ComponentClass>
+</SpineML>

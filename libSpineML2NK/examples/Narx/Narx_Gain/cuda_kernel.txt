@@ -1,0 +1,143 @@
+
+// double and 128 must be replaced using Python string foramtting
+#define NNEU 128
+__global__ void spine_ml_neuron(
+    int neu_num,
+    double dt,   
+    double      *output             // Output type assignment
+    ,double *mu_sv
+    ,double *nu_sv
+    ,double *mum_sv
+    ,double *num_sv
+    ,double *um_sv
+    ,double *Mean_y_1_sv
+    ,double *Mean_ym_1_sv
+    ,double *Mean_f_1_sv
+    ,double *Mean_g_1_sv
+    ,double *Mean_y_2_sv
+    ,double *Mean_ym_2_sv
+    ,double *Mean_f_2_sv
+    ,double *Mean_g_2_sv
+    ,double *Mean_y_3_sv
+    ,double *Mean_ym_3_sv
+    ,double *Mean_f_3_sv
+    ,double *Mean_g_3_sv
+    ,double *Mean_g_sv
+    ,double *u_hat_sv
+    ,double *Contrast_y_1_sv
+    ,double *Contrast_ym_1_sv
+    ,double *Contrast_f_1_sv
+    ,double *Contrast_g_1_sv
+    ,double *Contrast_y_2_sv
+    ,double *Contrast_ym_2_sv
+    ,double *Contrast_f_2_sv
+    ,double *Contrast_g_2_sv
+    ,double *Contrast_y_3_sv
+    ,double *Contrast_ym_3_sv
+    ,double *Contrast_f_3_sv
+    ,double *Contrast_g_3_sv
+    ,double *Contrast_g_sv
+    ,double *u_hat_thresh_sv
+    ,double *y_sv
+    ,double *y1_sv
+    ,double *y2_sv
+    ,double *y3_sv
+    ,double *y4_sv
+    ,double *y5_sv
+    ,double *y6_sv
+    ,double *u1_sv
+    ,double *u2_sv
+    ,double *u3_sv
+    ,double *u4_sv
+    ,double *u5_sv
+    ,double *u6_sv
+    ,double *u7_sv
+    ,                                // State Variable Assignment
+     double *u_s                                  // Set up Inputs - Assume since recieve port for I    
+    , double *Am_s, double *Bm_s, double *Mean_A_1_s, double *Mean_B_1_s, double *Mean_K_1_s, double *Mean_alpha_1_s, double *Mean_beta_1_s, double *Mean_A_2_s, double *Mean_B_2_s, double *Mean_K_2_s, double *Mean_alpha_2_s, double *Mean_beta_2_s, double *Mean_A_3_s, double *Mean_B_3_s, double *Mean_K_3_s, double *Mean_alpha_3_s, double *Mean_beta_3_s, double *bg_s, double *Contrast_A_1_s, double *Contrast_B_1_s, double *Contrast_K_1_s, double *Contrast_alpha_1_s, double *Contrast_beta_1_s, double *Contrast_A_2_s, double *Contrast_B_2_s, double *Contrast_K_2_s, double *Contrast_alpha_2_s, double *Contrast_beta_2_s, double *Contrast_A_3_s, double *Contrast_B_3_s, double *Contrast_K_3_s, double *Contrast_alpha_3_s, double *Contrast_beta_3_s, double *th0_s, double *th1_s, double *th2_s, double *th3_s, double *th4_s, double *th5_s, double *th6_s, double *th7_s, double *th8_s, double *th9_s, double *th10_s, double *th11_s, double *th12_s, double *th13_s, double *th14_s, double *Gain_Overide_s)                                   // Parameters
+{
+    int bid = blockIdx.x;
+    int nid = bid * NNEU + threadIdx.x;
+    double mu,
+	nu,
+	mum,
+	num,
+	um,
+	Mean_y_1,
+	Mean_ym_1,
+	Mean_f_1,
+	Mean_g_1,
+	Mean_y_2,
+	Mean_ym_2,
+	Mean_f_2,
+	Mean_g_2,
+	Mean_y_3,
+	Mean_ym_3,
+	Mean_f_3,
+	Mean_g_3,
+	Mean_g,
+	u_hat,
+	Contrast_y_1,
+	Contrast_ym_1,
+	Contrast_f_1,
+	Contrast_g_1,
+	Contrast_y_2,
+	Contrast_ym_2,
+	Contrast_f_2,
+	Contrast_g_2,
+	Contrast_y_3,
+	Contrast_ym_3,
+	Contrast_f_3,
+	Contrast_g_3,
+	Contrast_g,
+	u_hat_thresh,
+	y,
+	y1,
+	y2,
+	y3,
+	y4,
+	y5,
+	y6,
+	u1,
+	u2,
+	u3,
+	u4,
+	u5,
+	u6,
+	u7,
+	 Am,Bm,Mean_A_1,Mean_B_1,Mean_K_1,Mean_alpha_1,Mean_beta_1,Mean_A_2,Mean_B_2,Mean_K_2,Mean_alpha_2,Mean_beta_2,Mean_A_3,Mean_B_3,Mean_K_3,Mean_alpha_3,Mean_beta_3,bg,Contrast_A_1,Contrast_B_1,Contrast_K_1,Contrast_alpha_1,Contrast_beta_1,Contrast_A_2,Contrast_B_2,Contrast_K_2,Contrast_alpha_2,Contrast_beta_2,Contrast_A_3,Contrast_B_3,Contrast_K_3,Contrast_alpha_3,Contrast_beta_3,th0,th1,th2,th3,th4,th5,th6,th7,th8,th9,th10,th11,th12,th13,th14,Gain_Overide, u
+	;        // State Variable declarations and variables
+                                    // Dynamic output port 
+    
+    if( nid < neu_num ){
+        // Assign state variables to temporary vars
+        mu = mu_sv[nid];nu = nu_sv[nid];mum = mum_sv[nid];num = num_sv[nid];um = um_sv[nid];Mean_y_1 = Mean_y_1_sv[nid];Mean_ym_1 = Mean_ym_1_sv[nid];Mean_f_1 = Mean_f_1_sv[nid];Mean_g_1 = Mean_g_1_sv[nid];Mean_y_2 = Mean_y_2_sv[nid];Mean_ym_2 = Mean_ym_2_sv[nid];Mean_f_2 = Mean_f_2_sv[nid];Mean_g_2 = Mean_g_2_sv[nid];Mean_y_3 = Mean_y_3_sv[nid];Mean_ym_3 = Mean_ym_3_sv[nid];Mean_f_3 = Mean_f_3_sv[nid];Mean_g_3 = Mean_g_3_sv[nid];Mean_g = Mean_g_sv[nid];u_hat = u_hat_sv[nid];Contrast_y_1 = Contrast_y_1_sv[nid];Contrast_ym_1 = Contrast_ym_1_sv[nid];Contrast_f_1 = Contrast_f_1_sv[nid];Contrast_g_1 = Contrast_g_1_sv[nid];Contrast_y_2 = Contrast_y_2_sv[nid];Contrast_ym_2 = Contrast_ym_2_sv[nid];Contrast_f_2 = Contrast_f_2_sv[nid];Contrast_g_2 = Contrast_g_2_sv[nid];Contrast_y_3 = Contrast_y_3_sv[nid];Contrast_ym_3 = Contrast_ym_3_sv[nid];Contrast_f_3 = Contrast_f_3_sv[nid];Contrast_g_3 = Contrast_g_3_sv[nid];Contrast_g = Contrast_g_sv[nid];u_hat_thresh = u_hat_thresh_sv[nid];y = y_sv[nid];y1 = y1_sv[nid];y2 = y2_sv[nid];y3 = y3_sv[nid];y4 = y4_sv[nid];y5 = y5_sv[nid];y6 = y6_sv[nid];u1 = u1_sv[nid];u2 = u2_sv[nid];u3 = u3_sv[nid];u4 = u4_sv[nid];u5 = u5_sv[nid];u6 = u6_sv[nid];u7 = u7_sv[nid];         
+                    
+        // Assign input to recieve port
+         u = u_s[nid] * 1.000000;                          
+
+        // Assign variables from shared memory
+        Am = Am_s[nid];Bm = Bm_s[nid];Mean_A_1 = Mean_A_1_s[nid];Mean_B_1 = Mean_B_1_s[nid];Mean_K_1 = Mean_K_1_s[nid];Mean_alpha_1 = Mean_alpha_1_s[nid];Mean_beta_1 = Mean_beta_1_s[nid];Mean_A_2 = Mean_A_2_s[nid];Mean_B_2 = Mean_B_2_s[nid];Mean_K_2 = Mean_K_2_s[nid];Mean_alpha_2 = Mean_alpha_2_s[nid];Mean_beta_2 = Mean_beta_2_s[nid];Mean_A_3 = Mean_A_3_s[nid];Mean_B_3 = Mean_B_3_s[nid];Mean_K_3 = Mean_K_3_s[nid];Mean_alpha_3 = Mean_alpha_3_s[nid];Mean_beta_3 = Mean_beta_3_s[nid];bg = bg_s[nid];Contrast_A_1 = Contrast_A_1_s[nid];Contrast_B_1 = Contrast_B_1_s[nid];Contrast_K_1 = Contrast_K_1_s[nid];Contrast_alpha_1 = Contrast_alpha_1_s[nid];Contrast_beta_1 = Contrast_beta_1_s[nid];Contrast_A_2 = Contrast_A_2_s[nid];Contrast_B_2 = Contrast_B_2_s[nid];Contrast_K_2 = Contrast_K_2_s[nid];Contrast_alpha_2 = Contrast_alpha_2_s[nid];Contrast_beta_2 = Contrast_beta_2_s[nid];Contrast_A_3 = Contrast_A_3_s[nid];Contrast_B_3 = Contrast_B_3_s[nid];Contrast_K_3 = Contrast_K_3_s[nid];Contrast_alpha_3 = Contrast_alpha_3_s[nid];Contrast_beta_3 = Contrast_beta_3_s[nid];th0 = th0_s[nid];th1 = th1_s[nid];th2 = th2_s[nid];th3 = th3_s[nid];th4 = th4_s[nid];th5 = th5_s[nid];th6 = th6_s[nid];th7 = th7_s[nid];th8 = th8_s[nid];th9 = th9_s[nid];th10 = th10_s[nid];th11 = th11_s[nid];th12 = th12_s[nid];th13 = th13_s[nid];th14 = th14_s[nid];Gain_Overide = Gain_Overide_s[nid];                            
+       
+        // update differential
+                                        
+
+        // zero our output (required for spiking)
+        
+
+        // Conditions
+        if( 1==1 ){ mu = (Am*(u+um))-(Bm*(mum));nu = u-mu;Mean_y_1 = (Mean_A_1*(u+um))-(Mean_B_1*(Mean_ym_1));Contrast_y_1 = (Contrast_A_1*(u+um))-(Contrast_B_1*(Contrast_ym_1));Mean_f_1 = Mean_K_1 * pow(((Mean_y_1)),Mean_alpha_1);Mean_g_1 = (Mean_beta_1+((((Mean_f_1*1000) - Mean_beta_1))/(1+exp(((Mean_f_1*1000) -Mean_beta_1)))))/1000;Mean_y_2 = (Mean_A_2*(u + um))-(Mean_B_2*(Mean_ym_2));Mean_f_2 = Mean_K_2 * pow(((Mean_y_2)),Mean_alpha_2);Mean_g_2 = (Mean_beta_2+((((Mean_f_2*1000) - Mean_beta_2))/(1+exp(((Mean_f_2*1000) -Mean_beta_2)))))/1000;Mean_y_3 = (Mean_A_3*(u+um))-(Mean_B_3*(Mean_ym_3));Mean_f_3 = Mean_K_3 * pow(((Mean_y_3)),Mean_alpha_3);Mean_g_3 = (Mean_beta_3+((((Mean_f_3*1000) - Mean_beta_3))/(1+exp(((Mean_f_3*1000) -Mean_beta_3)))))/1000;Mean_ym_2 = Mean_y_2;Mean_ym_3 = Mean_y_3;Mean_g = Mean_g_1+Mean_g_2+Mean_g_3;Mean_ym_1 = Mean_y_1;Contrast_f_1 = Contrast_K_1* pow(((Contrast_y_1)),Contrast_alpha_1);Contrast_g_1 = (Contrast_beta_1+((((Contrast_f_1*1000) - Contrast_beta_1))/(1+exp(((Contrast_f_1*1000) -Contrast_beta_1)))))/1000
+;Contrast_y_2 = (Contrast_A_2*(u + um))-(Contrast_B_2*(Contrast_ym_2));Contrast_f_2 = Contrast_K_2 * pow(((Contrast_y_2)),Contrast_alpha_2);Contrast_g_2 = (Contrast_beta_2+((((Contrast_f_2*1000) - Contrast_beta_2))/(1+exp(((Contrast_f_2*1000) -Contrast_beta_2)))))/1000;Contrast_y_3 = (Contrast_A_3*(u+um))-(Contrast_B_3*(Contrast_ym_3));Contrast_f_3 = Contrast_K_3 * pow(((Contrast_y_3)),Contrast_alpha_3);Contrast_g_3 = (Contrast_beta_3+((((Contrast_f_3*1000) - Contrast_beta_3))/(1+exp(((Contrast_f_3*1000) -Contrast_beta_3)))))/1000
+;Contrast_ym_2 = Contrast_y_2;Contrast_ym_3 = Contrast_y_3;Contrast_g = (Contrast_g_1+Contrast_g_2+Contrast_g_3);u_hat = mu*Mean_g + nu*Contrast_g;u_hat_thresh = (bg+(((u_hat*1000)-bg)/(1+exp((u_hat*1000)-bg))))/1000;Contrast_ym_1 = Contrast_y_1;um = u;mum = mu;num = nu;u7 = u6;u6 = u5;u5 = u4;u4 = u3;u3 = u2;u2 = u1;u1 = u_hat_thresh;y6 = y5;y5 = y4;y4 = y3;y3 = y2;y2 = y1;y1 = y;y = th0 *y1+th1 *y3+th2 *u5*u4+th3+th4 *u6 +th5 *u4*y6+th6 *u7 +th7 *u7*u6+th8 *y4 +th9 *y5 +th10*u4*y5+th11*u4*y2+th12*u7*u3+th13*u5 +th14*u4;}                                
+                   
+        // Save State Variables
+        mu_sv[nid] = mu;nu_sv[nid] = nu;mum_sv[nid] = mum;num_sv[nid] = num;um_sv[nid] = um;Mean_y_1_sv[nid] = Mean_y_1;Mean_ym_1_sv[nid] = Mean_ym_1;Mean_f_1_sv[nid] = Mean_f_1;Mean_g_1_sv[nid] = Mean_g_1;Mean_y_2_sv[nid] = Mean_y_2;Mean_ym_2_sv[nid] = Mean_ym_2;Mean_f_2_sv[nid] = Mean_f_2;Mean_g_2_sv[nid] = Mean_g_2;Mean_y_3_sv[nid] = Mean_y_3;Mean_ym_3_sv[nid] = Mean_ym_3;Mean_f_3_sv[nid] = Mean_f_3;Mean_g_3_sv[nid] = Mean_g_3;Mean_g_sv[nid] = Mean_g;u_hat_sv[nid] = u_hat;Contrast_y_1_sv[nid] = Contrast_y_1;Contrast_ym_1_sv[nid] = Contrast_ym_1;Contrast_f_1_sv[nid] = Contrast_f_1;Contrast_g_1_sv[nid] = Contrast_g_1;Contrast_y_2_sv[nid] = Contrast_y_2;Contrast_ym_2_sv[nid] = Contrast_ym_2;Contrast_f_2_sv[nid] = Contrast_f_2;Contrast_g_2_sv[nid] = Contrast_g_2;Contrast_y_3_sv[nid] = Contrast_y_3;Contrast_ym_3_sv[nid] = Contrast_ym_3;Contrast_f_3_sv[nid] = Contrast_f_3;Contrast_g_3_sv[nid] = Contrast_g_3;Contrast_g_sv[nid] = Contrast_g;u_hat_thresh_sv[nid] = u_hat_thresh;y_sv[nid] = y;y1_sv[nid] = y1;y2_sv[nid] = y2;y3_sv[nid] = y3;y4_sv[nid] = y4;y5_sv[nid] = y5;y6_sv[nid] = y6;u1_sv[nid] = u1;u2_sv[nid] = u2;u3_sv[nid] = u3;u4_sv[nid] = u4;u5_sv[nid] = u5;u6_sv[nid] = u6;u7_sv[nid] = u7;                        
+
+        // Assumes one output variable
+        output[nid] = y;        
+
+    }
+    
+    return; 
+
+}

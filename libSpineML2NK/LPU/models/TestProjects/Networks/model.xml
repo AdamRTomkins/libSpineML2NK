@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LL:SpineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.shef.ac.uk/SpineMLNetworkLayer" xmlns:LL="http://www.shef.ac.uk/SpineMLLowLevelNetworkLayer" xsi:schemaLocation="http://www.shef.ac.uk/SpineMLLowLevelNetworkLayer SpineMLLowLevelNetworkLayer.xsd http://www.shef.ac.uk/SpineMLNetworkLayer SpineMLNetworkLayer.xsd" name=" NetworkLayer">
+    <LL:Population>
+        <LL:Neuron name="O_O_pop_1" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-60"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="v" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="t_spike" dimension="?"/>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+        <LL:Projection dst_population="O_O_pop_2">
+            <LL:Synapse>
+                <OneToOneConnection>
+                    <Delay Dimension="ms">
+                        <FixedValue value="0"/>
+                    </Delay>
+                </OneToOneConnection>
+                <LL:WeightUpdate name="O_O_pop_1 to O_O_pop_2 Synapse 0 weight_update" url="FixedWeight.xml" input_src_port="spike" input_dst_port="spike">
+                    <Property name="w" dimension="?">
+                        <FixedValue value="1"/>
+                    </Property>
+                </LL:WeightUpdate>
+                <LL:PostSynapse name="O_O_pop_1 to O_O_pop_2 Synapse 0 postsynapse" url="ExpSynapse.xml" input_src_port="w" input_dst_port="pre" output_src_port="eff" output_dst_port="I_Syn">
+                    <Property name="a" dimension="?">
+                        <FixedValue value="1"/>
+                    </Property>
+                    <Property name="tau" dimension="?">
+                        <FixedValue value="10"/>
+                    </Property>
+                    <Property name="gmax" dimension="?">
+                        <FixedValue value="0"/>
+                    </Property>
+                    <Property name="eff" dimension="mA">
+                        <FixedValue value="0"/>
+                    </Property>
+                </LL:PostSynapse>
+            </LL:Synapse>
+        </LL:Projection>
+    </LL:Population>
+    <LL:Population>
+        <LL:Neuron name="O_O_pop_2" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-60"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="v" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="t_spike" dimension="?"/>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+    </LL:Population>
+    <LL:Population>
+        <LL:Neuron name="A_A_pop_1" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-60"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="v" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="t_spike" dimension="?"/>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+        <LL:Projection dst_population="A_A_pop_2">
+            <LL:Synapse>
+                <AllToAllConnection>
+                    <Delay Dimension="ms">
+                        <FixedValue value="0"/>
+                    </Delay>
+                </AllToAllConnection>
+                <LL:WeightUpdate name="A_A_pop_1 to A_A_pop_2 Synapse 0 weight_update" url="FixedWeight.xml" input_src_port="spike" input_dst_port="spike">
+                    <Property name="w" dimension="?">
+                        <FixedValue value="1"/>
+                    </Property>
+                </LL:WeightUpdate>
+                <LL:PostSynapse name="A_A_pop_1 to A_A_pop_2 Synapse 0 postsynapse" url="ExpSynapse.xml" input_src_port="w" input_dst_port="pre" output_src_port="eff" output_dst_port="I_Syn">
+                    <Property name="a" dimension="?">
+                        <FixedValue value="1"/>
+                    </Property>
+                    <Property name="tau" dimension="?">
+                        <FixedValue value="10"/>
+                    </Property>
+                    <Property name="gmax" dimension="?">
+                        <FixedValue value="0"/>
+                    </Property>
+                    <Property name="eff" dimension="mA">
+                        <FixedValue value="0"/>
+                    </Property>
+                </LL:PostSynapse>
+            </LL:Synapse>
+        </LL:Projection>
+    </LL:Population>
+    <LL:Population>
+        <LL:Neuron name="A_A_pop_2" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-60"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="v" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="t_spike" dimension="?"/>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+    </LL:Population>
+    <LL:Population>
+        <LL:Neuron name="FP_pop_1" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-60"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="v" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="t_spike" dimension="?"/>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+        <LL:Projection dst_population="FP_pop_2">
+            <LL:Synapse>
+                <FixedProbabilityConnection probability="0.5" seed="123">
+                    <Delay Dimension="ms">
+                        <FixedValue value="0"/>
+                    </Delay>
+                </FixedProbabilityConnection>
+                <LL:WeightUpdate name="FP_pop_1 to FP_pop_2 Synapse 0 weight_update" url="FixedWeight.xml" input_src_port="spike" input_dst_port="spike">
+                    <Property name="w" dimension="?"/>
+                </LL:WeightUpdate>
+                <LL:PostSynapse name="FP_pop_1 to FP_pop_2 Synapse 0 postsynapse" url="ExpSynapse.xml" input_src_port="w" input_dst_port="pre" output_src_port="eff" output_dst_port="I_Syn">
+                    <Property name="a" dimension="?">
+                        <FixedValue value="1"/>
+                    </Property>
+                    <Property name="tau" dimension="?">
+                        <FixedValue value="10"/>
+                    </Property>
+                    <Property name="gmax" dimension="?">
+                        <FixedValue value="0"/>
+                    </Property>
+                    <Property name="eff" dimension="mA">
+                        <FixedValue value="0"/>
+                    </Property>
+                </LL:PostSynapse>
+            </LL:Synapse>
+        </LL:Projection>
+    </LL:Population>
+    <LL:Population>
+        <LL:Neuron name="FP_pop_2" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-60"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="v" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="t_spike" dimension="?"/>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+    </LL:Population>
+    <LL:Population>
+        <LL:Neuron name="CL_pop_1" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-60"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="v" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="t_spike" dimension="?"/>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+        <LL:Projection dst_population="CL_pop_2">
+            <LL:Synapse>
+                <ConnectionList>
+                    <Connection src_neuron="1" dst_neuron="2" delay="0"/>
+                    <Connection src_neuron="3" dst_neuron="4" delay="0"/>
+                </ConnectionList>
+                <LL:WeightUpdate name="CL_pop_1 to CL_pop_2 Synapse 0 weight_update" url="FixedWeight.xml" input_src_port="spike" input_dst_port="spike">
+                    <Property name="w" dimension="?">
+                        <FixedValue value="1"/>
+                    </Property>
+                </LL:WeightUpdate>
+                <LL:PostSynapse name="CL_pop_1 to CL_pop_2 Synapse 0 postsynapse" url="ExpSynapse.xml" input_src_port="w" input_dst_port="pre" output_src_port="eff" output_dst_port="I_Syn">
+                    <Property name="a" dimension="?">
+                        <FixedValue value="1"/>
+                    </Property>
+                    <Property name="tau" dimension="?">
+                        <FixedValue value="10"/>
+                    </Property>
+                    <Property name="gmax" dimension="?">
+                        <FixedValue value="0"/>
+                    </Property>
+                    <Property name="eff" dimension="mA">
+                        <FixedValue value="0"/>
+                    </Property>
+                </LL:PostSynapse>
+            </LL:Synapse>
+        </LL:Projection>
+    </LL:Population>
+    <LL:Population>
+        <LL:Neuron name="CL_pop_2" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="0"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-60"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="v" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="t_spike" dimension="?"/>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+    </LL:Population>
+</LL:SpineML>

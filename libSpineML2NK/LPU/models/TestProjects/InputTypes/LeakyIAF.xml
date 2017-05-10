@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<SpineML xsi:schemaLocation="http://www.shef.ac.uk/SpineMLComponentLayer SpineMLComponentLayer.xsd" xmlns="http://www.shef.ac.uk/SpineMLComponentLayer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <ComponentClass type="neuron_body" name="LeakyIAF">
+  <Dynamics initial_regime="integrating">
+   <Regime name="integrating">
+    <TimeDerivative variable="V">
+     <MathInline>((I_Syn) / C) + (Vr - V) / (R*C)</MathInline>
+    </TimeDerivative>
+    <OnCondition target_regime="integrating">
+     <StateAssignment variable="V">
+      <MathInline>Vr</MathInline>
+     </StateAssignment>
+     <StateAssignment variable="t_spike">
+      <MathInline>t</MathInline>
+     </StateAssignment>
+     <EventOut port="spike"/>
+     <Trigger>
+      <MathInline>V > Vt</MathInline>
+     </Trigger>
+    </OnCondition>
+   </Regime>
+   <StateVariable dimension="mV" name="V"/>
+   <StateVariable dimension="?" name="t_spike"/>
+  </Dynamics>
+  <AnalogReducePort dimension="mA" name="I_Syn" reduce_op="+"/>
+  <AnalogSendPort name="V"/>
+  <EventSendPort name="spike"/>
+  <Parameter dimension="nS" name="C"/>
+  <Parameter dimension="mV" name="Vt"/>
+  <Parameter dimension="mV" name="Er"/>
+  <Parameter dimension="mV" name="Vr"/>
+  <Parameter dimension="MOhm" name="R"/>
+ </ComponentClass>
+</SpineML>

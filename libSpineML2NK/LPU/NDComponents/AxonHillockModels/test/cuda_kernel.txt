@@ -1,0 +1,49 @@
+
+// double and 128 must be replaced using Python string foramtting
+#define NNEU 128
+__global__ void spine_ml_neuron(
+    int neu_num,
+    double dt,   
+    double      *output             // Output type assignment
+    ,double *V_sv
+    ,                                // State Variable Assignment
+     double *I_Syn_s                                  // Set up Inputs - Assume since recieve port for I    
+    , double *C_s, double *Vt_s, double *Er_s, double *Vr_s, double *R_s)                                   // Parameters
+{
+    int bid = blockIdx.x;
+    int nid = bid * NNEU + threadIdx.x;
+    double V,
+	 C,Vt,Er,Vr,R, I_Syn
+	;        // State Variable declarations and variables
+                                    // Dynamic output port 
+    
+    if( nid < neu_num ){
+        // Assign state variables to temporary vars
+        V = V_sv[nid];         
+                    
+        // Assign input to recieve port
+         I_Syn = I_Syn_s[nid] * 0.001000;                          
+
+        // Assign variables from shared memory
+        C = C_s[nid];Vt = Vt_s[nid];Er = Er_s[nid];Vr = Vr_s[nid];R = R_s[nid];                            
+       
+        // update differential
+        V = V+ (dt * (((I_Syn) / C) + (Er - V) / (R*C)));                                
+
+        // zero our output (required for spiking)
+        
+
+        // Conditions
+        if( V > Vt ){ V = Vr;}                                
+                   
+        // Save State Variables
+        V_sv[nid] = V;                        
+
+        // Assumes one output variable
+        output[nid] = V;        
+
+    }
+    
+    return; 
+
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LL:SpineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.shef.ac.uk/SpineMLNetworkLayer" xmlns:LL="http://www.shef.ac.uk/SpineMLLowLevelNetworkLayer" xsi:schemaLocation="http://www.shef.ac.uk/SpineMLLowLevelNetworkLayer SpineMLLowLevelNetworkLayer.xsd http://www.shef.ac.uk/SpineMLNetworkLayer SpineMLNetworkLayer.xsd" name="Untitled Project">
+    <LL:Population>
+        <LL:Neuron name="Population" size="5" url="LeakyIAF.xml">
+            <Property name="C" dimension="nS">
+                <FixedValue value="1"/>
+            </Property>
+            <Property name="Vt" dimension="mV">
+                <FixedValue value="-10"/>
+            </Property>
+            <Property name="Er" dimension="mV">
+                <FixedValue value="-70"/>
+            </Property>
+            <Property name="Vr" dimension="mV">
+                <FixedValue value="-100"/>
+            </Property>
+            <Property name="R" dimension="MOhm">
+                <FixedValue value="3"/>
+            </Property>
+            <Property name="V" dimension="mV">
+                <FixedValue value="-65"/>
+            </Property>
+            <Property name="test" dimension="V">
+                <FixedValue value="0"/>
+            </Property>
+        </LL:Neuron>
+        <Layout url="none.xml" seed="123" minimum_distance="0"/>
+    </LL:Population>
+</LL:SpineML>

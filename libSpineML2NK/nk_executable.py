@@ -19,8 +19,8 @@ import networkx as nx
 import h5py
 
 import libSpineML
-from libSpineML import smlBundle
-from libSpineML import smlExperiment
+from libSpineML import smlBundle as smlBundle
+from libSpineML import smlExperiment as smlExperiment
 from neurokernel.core_gpu import Manager
 
 from libSpineML.smlComponent import AnalogReducePortType
@@ -35,7 +35,7 @@ import nk_manager
 
 from libSpineML2NK.LPU.InputProcessors.FileInputProcessor import FileInputProcessor
 from libSpineML2NK.LPU.OutputProcessors.FileOutputProcessor import FileOutputProcessor
-
+from libSpineML2NK.LPU.OutputProcessors.CrossbarOutputProcessor import CrossbarOutputProcessor
 from libSpineML2NK.LPU.NDComponents.AxonHillockModels.SpikingSpineML import SpikingSpineML
 
 class Executable(object):
@@ -58,6 +58,22 @@ class Executable(object):
             self.bundle = experiment
             exp = self.bundle.experiments[0].Experiment[0] 
             self.params['name'] = exp.get_name()
+
+        elif type(experiment) is dict:
+            # Catch crossbar dictionaries:
+            """
+            {
+                'experiment': "..."
+                'network':    "..."  
+                'components': ["..."]
+            }
+            """
+            self.bundle = smlBundle.Bundle(project_dict=experiment)
+            exp = self.bundle.experiments[0].Experiment[0] 
+            self.params['name'] = exp.get_name()
+
+
+
         else:
             self.bundle = smlBundle.Bundle()
             self.params['name'] = 'No_name'
@@ -121,7 +137,8 @@ class Executable(object):
         record_vars = [ (x,None) for x in updates]
         fl_output_processors = []        
         for r in record_vars:
-            fl_output_processors.append(FileOutputProcessor([r], self.params['output_file']+r[0], sample_interval=1))
+            #fl_output_processors.append(CrossbarOutputProcessor([r],url='http://127.0.0.1:8080/publish', topic= 'ffbo.sharc.update', sample_interval=1)) # TODO! ADD CLIENT ID TO topic!
+            fl_output_processors.append(FileOutputProcessor([r],'./output.h5', sample_interval=1)) # TODO! ADD CLIENT ID TO topic!
 
         self.params['output_processors'] = fl_output_processors
     
@@ -129,7 +146,7 @@ class Executable(object):
 
         from nk_manager import launch_nk
     
-        print "launch nk"
+        print "Launching nk"
         launch_nk(self.params,self.debug,self.log)
 
     def set_debug(self, debug=True):
@@ -169,8 +186,8 @@ class Executable(object):
         ######################################################################
         # Correct dt and time to be in standard
         #####################################################################
-
-        self.inputs = np.zeros((self.params['steps'], self.params['num_neurons']), dtype=np.double)
+        print self.params
+        self.inputs = np.zeros((int(self.params['steps']), int(self.params['num_neurons'])), dtype=np.double)
         self.time   = time = np.arange(0,self.params['dt']*self.params['steps'] , self.params['dt'])
 
         # Provess Lesions
@@ -200,8 +217,6 @@ class Executable(object):
         fl_input_processor = FileInputProcessor(self.params['input_file'])
         self.params['input_processors'].append(fl_input_processor)
 
-
-
         pass
 
     def process_network(self):
@@ -213,6 +228,9 @@ class Executable(object):
         # create s_dict
 
         exp_name = self.bundle.index.keys()[0]
+
+        print "Experiment Name : %s" % self.bundle.index[exp_name]
+
         model_name = self.bundle.index[exp_name]['network'].keys()[0]
         populations = self.bundle.index[exp_name]['network'][model_name].Population
 
